@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.agora.need.NeedDetailActivity">
+
+    <include
+        android:id="@+id/tool_bar"
+        layout="@layout/tool_bar"
+        />
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tool_bar"
+        android:id="@+id/linearLayout"
+        >
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_dropshadow_height"
+            android:background="@drawable/toolbar_dropshadow" />
+
+
+
+        <!--fragment
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:name="com.agora.need.NeedNewDescriptionFragment"
+            android:id="@+id/fragment7" /-->
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment9" />
+
+
+    </LinearLayout>
+</RelativeLayout>

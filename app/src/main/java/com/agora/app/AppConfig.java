@@ -1,0 +1,114 @@
+package com.agora.app;
+
+import com.agora.R;
+import com.agora.data.DataProviderFactory;
+import com.agora.data.IDataProvider;
+import com.agora.data.MockDataProvider;
+import com.agora.data.WSDataProvider;
+import com.agora.demo.DemoDTO;
+
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * Created by Ivan on 20/09/15.
+ */
+public  final class AppConfig {
+
+    public static IDataProvider dataProvider= DataProviderFactory.createDataProvider(WSDataProvider.class.getName());
+
+    public static final int TIMEOUT_HTTP_CONNECTION = 20000;
+
+    public static final NumberFormat CURRENCY_FORMAT= NumberFormat.getCurrencyInstance(Locale.US);
+
+    //public static final String WS_URL="https://104.236.29.211:8443/WebServer/api/";
+
+    public static String IP1="http://192.168.1.125";
+
+    public static String IP2="http://192.168.1.101";
+
+    public static String PORT80=":80";
+
+    public static String PORT8080=":8080";
+
+
+    private static final String[] PORTS=new String[]{PORT80,PORT8080};
+
+    private static final String[] IPS=new String[]{IP1,IP2};
+
+    private static final int  INDEX_IP=1    ;
+
+    public static final String WS_URL=IPS[INDEX_IP]+PORTS[1]+"/imtioweb/api/";
+
+    public static final String IMAGES_URL=IPS[INDEX_IP]+PORTS[0]+"/images/";
+
+    public static final String THUMBNAILS_URL=IPS[INDEX_IP]+PORTS[0]+"/images/thumbnails/";
+
+    public static final String ICONS_URL=IPS[INDEX_IP]+PORTS[0]+"/images/icons/";
+
+    public static final String COMPANY_URL=IPS[INDEX_IP]+PORTS[0]+"/images/companies/";
+
+
+    public static final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+
+    public static final String PREF_KEY_USER_NAME="username";
+
+    public static final String PREF_KEY_USER_LAST_NAME="userlastname";
+
+    public static final String PREF_KEY_USER_KEY="userkey";
+
+    public static final String PREF_KEY_NOTIF_SOUND_NEW_BID= "pref_notification_sound_new_bid";
+
+    public static final String PREF_KEY_NOTIF_VIB_NEW_BID ="pref_notification_vib_new_bid";
+
+    public static final String PREF_KEY_SKIP_NEED_TUTORIAL ="skip_list_need_tutorial";
+
+    public static final int PROGRESS_RUNNING=1;
+
+    public static final int PROGRESS_STOP=0;
+
+    public static final int  REQUEST_CAMERA=1;
+
+    public static final int SELECT_FILE=2;
+
+    public static final String CATEGORY="category";
+
+    public static final  String PROJECT_NUMBER = "131711330906";
+
+    public static final  String DATABASE_NAME = "agora";
+
+    public static final int DATABASE_VERSION = 1;
+
+    public static final int THUMBNAIL_SIZE = 100;
+
+    public static final String MSG_RECEIVED="D";
+
+    public static final String APP_NAME="imtio";
+
+    public static final String MSG_CREATED="C";
+
+    public static final String MSG_READ="R";
+
+    public static final String MSG_HEADER_M_T="M:T:";
+    public static final String MSG_HEADER_M_E="M:E:";
+    public static final String MSG_HEADER_M_S="M:S:";
+    public static final String MSG_HEADER_N_B="N:B:";
+
+    public static final String INTENT_FILTER_MSG_STATUS_CHANGE="com.agora.msg.MSG_STATUS_CHANGE";
+
+
+
+    static{
+        CURRENCY_FORMAT.setMaximumFractionDigits(2);
+        CURRENCY_FORMAT.setMinimumFractionDigits(1);
+
+    }
+    private AppConfig(){
+
+    }
+
+
+}

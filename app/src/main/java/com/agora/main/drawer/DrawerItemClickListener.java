@@ -1,0 +1,143 @@
+package com.agora.main.drawer;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.entity.Auth;
+import com.agora.entity.Client;
+import com.agora.login.LoginActivity;
+import com.agora.main.SplashActivity;
+import com.agora.need.NeedListActivity;
+import com.agora.preference.NotificationPrefActivity;
+import com.agora.web.WebActivity;
+
+import java.io.IOException;
+
+/**
+ * Created by Ivan on 14/09/15.
+ */
+public class DrawerItemClickListener implements
+        ListView.OnItemClickListener {
+
+    private ProgressDialog progress;
+    private Context context;
+    //private GoogleCloudMessaging gcm;
+    public AppContext appContext;
+
+    public DrawerItemClickListener (Context context){
+        this.context=context;
+        appContext= (AppContext)context.getApplicationContext();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view,final int position, long id) {
+        Intent intent=null;
+        switch (position){
+            case 1:
+                intent = new Intent(context,NeedListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                break;
+            case 2:
+                intent = new Intent(context, NotificationPrefActivity.class);
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
+                intent = new Intent(context,WebActivity.class);
+                intent.putExtra(WebActivity.URL,"http://104.236.29.211");
+                break;
+            case 9:
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //Yes button clicked
+                                 new AsyncLogOutTask().execute();
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(R.string.are_you_sure_sign_out).setPositiveButton(R.string.yes, dialogClickListener)
+                        .setNegativeButton(R.string.no, dialogClickListener).show();
+
+            default:
+        }
+
+        if (intent !=null) {
+            context.startActivity(intent);
+        }
+    }
+
+
+
+   private class AsyncLogOutTask extends  AsyncTask<Void, Void, Void> {
+
+
+        @Override
+        public  void onPreExecute(){
+            progress = ProgressDialog.show(context,null,
+                    context.getResources().getString(R.string.please_wait), true);
+            progress.show();
+
+        }
+        @Override
+        protected Void doInBackground(Void... params) {
+            //gcm = GoogleCloudMessaging.getInstance(context);
+           // try {
+              //  gcm.unregister();
+                SharedPreferences settings=  PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.clear();
+                editor.commit();
+                appContext.getNeeds().clear();
+                appContext.setUser(null);
+                appContext.getBids().clear();
+                appContext.getAttachedImages().clear();
+                appContext.getImageURIs().clear();
+          //  } catch (IOException e) {
+            //    Log.e("DrawerItemClickListener",e.getMessage());
+            //}
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void msg) {
+            progress.dismiss();
+            Intent intent = new Intent(context, SplashActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            context.startActivity(intent);
+            ( (Activity)context).finish();
+
+        }
+    }
+}

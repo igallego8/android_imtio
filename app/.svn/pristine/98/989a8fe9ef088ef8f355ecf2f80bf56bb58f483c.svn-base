@@ -1,0 +1,23 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="fab_elevation">10dp</dimen>
+    <dimen name="fab_press_translation_z">9dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
+    <dimen name="fab_size_small">40dp</dimen>
+    <dimen name="fab_icon_size">24dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="drawer_text_item_size">8sp</dimen>
+    <dimen name="drawer_pref_height">60dp</dimen>
+    <dimen name="drawer_title_height">25dp</dimen>
+
+    <dimen name="toolbar_title">30sp</dimen>
+    <dimen name="toolbar_dropshadow_height">5dp</dimen>
+    <dimen name="toolbar_frame_height">5dp</dimen>
+    <dimen name="toolbar_height">80dp</dimen>
+    <dimen name="toolbar_elevation">2dp</dimen>
+
+</resources>

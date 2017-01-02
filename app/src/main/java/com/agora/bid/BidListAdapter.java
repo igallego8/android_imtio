@@ -1,0 +1,286 @@
+package com.agora.bid;
+
+import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.style.TtsSpan;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RatingBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.db.dao.ChatDAO;
+import com.agora.db.dao.ChatUserDAO;
+import com.agora.deal.DealActivity;
+import com.agora.entity.Bid;
+import com.agora.entity.Chat;
+import com.agora.entity.ChatUser;
+import com.agora.entity.Need;
+import com.agora.image.ImageDialogFragment;
+import com.agora.listener.OnItemTouchListener;
+import com.agora.msg.MessageActivity;
+import com.agora.util.ExpandableTextView;
+import com.agora.util.GenericAlertDialog;
+import com.agora.util.UtilProcess;
+import com.agora.util.listadapter.Item;
+import com.agora.util.listadapter.ListItemAdapter;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
+
+import java.util.ArrayList;
+import java.util.Currency;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * Created by Ivan on 13/09/15.
+ */
+public class BidListAdapter extends RecyclerView.Adapter<BidListAdapter.ViewHolder>  {
+    private List<Bid> mDataset= new ArrayList<>();
+    private OnItemTouchListener onItemTouchListener;
+    private RecyclerView mRecyclerViewImage;
+    private RecyclerView.Adapter mAdapterImage;
+    private Need need;
+    private AppContext appContext;
+
+    private ProgressDialog progress;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public View view;
+        public ViewHolder(View v) {
+            super(v);
+            view = v;
+        }
+    }
+
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public BidListAdapter(List<Bid> myDataset,OnItemTouchListener onItemTouchListener,Need need) {
+        this.mDataset = myDataset;
+        this.onItemTouchListener=onItemTouchListener;
+        this.need=need;
+    }
+
+    // Create new views (invoked by the layout manager)
+    @Override
+    public BidListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                   int viewType) {
+        // create a new view
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.cv_bid_item2, parent, false);
+        ViewHolder vh = new ViewHolder(v);
+        return vh;
+    }
+
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(final ViewHolder holder,final int position) {
+        ImageButton bidOptions= (ImageButton)holder.view.findViewById(R.id.ib_bid_options);
+        bidOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog(holder, position);
+            }
+        });
+        LinearLayout btnLayout= (LinearLayout)holder.view.findViewById(R.id.layout_bts);
+        appContext = (AppContext) holder.view.getContext().getApplicationContext();
+        if (mDataset.get(position).getDealKey()!=null && mDataset.get(position).getDealKey().longValue()!=0L) {
+            bidOptions.setVisibility(View.GONE);
+            btnLayout.setVisibility(View.GONE);
+        }
+
+        ExpandableTextView needDescription = (ExpandableTextView) holder.view.findViewById(R.id.tv_description);
+        needDescription.setText(mDataset.get(position).getObservation());
+        FrameLayout frameLogo= (FrameLayout)holder.view.findViewById(R.id.frame_logo);
+        TextView companyName= (TextView) holder.view.findViewById(R.id.tv_company_name);
+        TextView price= (TextView) holder.view.findViewById(R.id.tv_price);
+        TextView letterName= new TextView(holder.view.getContext());
+        RatingBar ratingBar = (RatingBar) holder.view.findViewById(R.id.ratingBar);
+        SimpleDraweeView image= new  SimpleDraweeView(holder.view.getContext());
+        Currency currency= Currency.getInstance(Locale.US);
+        TextView expirationDate= (TextView) holder.view.findViewById(R.id.tv_expiration_date);
+        companyName.setText(mDataset.get(position).getCompany().getCompanyName());
+        ratingBar.setRating(mDataset.get(position).getCompany().getRating());
+        String logo= mDataset.get(position).getCompany().getLogo();
+        price.setText(currency.getCurrencyCode()+""+AppConfig.CURRENCY_FORMAT.format(mDataset.get(position).getPrice()));
+        if (logo!=null  && logo.trim().length()!=0) {
+            GenericDraweeHierarchyBuilder builder =
+                    new GenericDraweeHierarchyBuilder(holder.view.getResources());
+            GenericDraweeHierarchy hierarchy = builder
+                    .setFadeDuration(300)
+                    .setRoundingParams(new RoundingParams().setRoundAsCircle(true))
+                    .build();
+            Uri uri = Uri.parse(AppConfig.COMPANY_URL + logo);
+            image.setImageURI(uri);
+            image.setHierarchy(hierarchy);
+            image.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT));
+            frameLogo.addView(image);
+        }else{
+            letterName.setText(mDataset.get(position).getCompany().getCompanyName().substring(0, 1));
+            letterName.setBackgroundDrawable(UtilProcess.getRoundColorDrawable());
+            letterName.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT));
+            letterName.setTextAppearance(holder.view.getContext(), R.style.text_5);
+            letterName.setGravity(Gravity.CENTER);
+            frameLogo.addView(letterName);
+        }
+        Date date = mDataset.get(position).getExpirationDate();
+        int days=UtilProcess.daysToExpirate(date);
+        String quantityString = holder.view.getResources().getQuantityString(R.plurals.expiration_days,
+                days, days);
+        expirationDate.setText(quantityString);
+
+        if (mDataset.get(position).isShipToClientDestination()) {
+            ImageView icon = (ImageView) holder.view.findViewById(R.id.iv_ship_client_location);
+            icon.setVisibility(View.VISIBLE);
+        }
+
+        if (mDataset.get(position).isCreditCardPayment()) {
+            ImageView icon = (ImageView) holder.view.findViewById(R.id.iv_credit_card);
+            icon.setVisibility(View.VISIBLE);
+        }
+
+        if (mDataset.get(position).isDeliveryOnSaleSite()) {
+            ImageView icon = (ImageView) holder.view.findViewById(R.id.iv_delivery_shop_location);
+            icon.setVisibility(View.VISIBLE);
+        }
+
+        if (mDataset.get(position).isCashPayment()) {
+            ImageView icon = (ImageView) holder.view.findViewById(R.id.iv_cash);
+            icon.setVisibility(View.VISIBLE);
+        }
+        if (mDataset.get(position).getDeliveryDaysAfterDeal()!=0) {
+            LinearLayout layout =(LinearLayout) holder.view.findViewById(R.id.layout_delivery_days);
+            layout.setVisibility(View.VISIBLE);
+            TextView textDays = ( TextView)holder.view.findViewById(R.id.tv_delivery_days);
+            int d = mDataset.get(position).getDeliveryDaysAfterDeal();
+            String text = holder.view.getResources().getQuantityString(R.plurals.days, d, d);
+            textDays.setText(text);
+        }
+
+
+        LinearLayout msgButton=(LinearLayout) holder.view.findViewById(R.id.layout_message);
+        msgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(holder.view.getContext(), MessageActivity.class);
+                ChatDAO dao= ChatDAO.getInstance();
+                List<Chat> chatList= dao.fetchChatByUserKeyNeedKey(appContext.getBids().get(position).getUser().getUserKey(), need.getNeedKey());
+                if (chatList.size()==0){
+                    Chat chat= new Chat();
+                    chat.setSettlementDate(new Date(System.currentTimeMillis()));
+                    chat.setQtyNewMessages(0);
+                    chat.setLastTextMessage("");
+                    chat.setUserKey(appContext.getBids().get(position).getUser().getUserKey());
+                    chat.setNeedKey(need.getNeedKey());
+                    dao.insert(chat);
+                    intent.putExtra("chat",chat) ;
+                }else{
+                    intent.putExtra("chat",chatList.get(0)) ;
+                }
+                holder.view.getContext().startActivity(intent);
+
+            }
+        });
+
+        LinearLayout dealButton=(LinearLayout) holder.view.findViewById(R.id.layout_deal);
+        dealButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //Yes button clicked
+
+                                onItemTouchListener.onButton1Click(holder.view,position);
+
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+
+                                break;
+                        }
+                    }
+                };
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(holder.view.getContext());
+                builder.setMessage(R.string.are_you_sure_make_deal).setPositiveButton(R.string.yes, dialogClickListener)
+                        .setNegativeButton(R.string.no, dialogClickListener).show();
+
+
+            }
+        });
+
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(holder.view.getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerViewImage = (RecyclerView) holder.view.findViewById(R.id.img_recycler_view);
+        List<String> images=new ArrayList<>();
+        if(mDataset.get(position).getImage1()!= null && !mDataset.get(position).getImage1().trim().equals("")) {
+            images.add(mDataset.get(position).getImage1());
+        }
+        if(mDataset.get(position).getImage2()!= null && !mDataset.get(position).getImage2().trim().equals("")) {
+            images.add(mDataset.get(position).getImage2());
+        }
+        if(mDataset.get(position).getImage3()!= null && !mDataset.get(position).getImage3().trim().equals("")) {
+            images.add(mDataset.get(position).getImage3());
+        }
+        if (images.size()>0){
+        mAdapterImage = new BidListImageAdapter(images,onItemTouchListener,position);
+        mRecyclerViewImage.setLayoutManager(layoutManager);
+        mRecyclerViewImage.setAdapter(mAdapterImage);
+        }else{
+            mRecyclerViewImage.setVisibility(View.GONE);
+        }
+    }
+
+    // Return the size of your dataset (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        return mDataset.size();
+    }
+
+    public void alertDialog(final ViewHolder holder,final int position){
+        GenericAlertDialog<ListItemAdapter> d= new GenericAlertDialog<>(new GenericAlertDialog.AlertDialogListener(){
+            @Override
+            public void onClickItemListener(DialogInterface dialog, int item) {
+                Toast.makeText(holder.view.getContext(), AppContext.BID_ITEM_OPTIONS[item].getTitle(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        ListItemAdapter adapter = new ListItemAdapter(holder.view.getContext(),AppContext.BID_ITEM_OPTIONS);
+        d.alertDialog(holder.view.getContext(), position, adapter,null);
+    }
+
+
+
+}

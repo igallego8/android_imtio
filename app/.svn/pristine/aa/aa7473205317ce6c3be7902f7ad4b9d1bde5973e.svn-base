@@ -1,0 +1,48 @@
+package com.agora.entity;
+
+import com.agora.entity.Client;
+import com.agora.entity.Company;
+import com.agora.entity.Need;
+
+/**
+ * Created by Ivan on 17/09/15.
+ */
+public class Conversation {
+
+    private String text;
+    private int totalNewMassages;
+    private Need need;
+    private Company company;
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public int getTotalNewMassages() {
+        return totalNewMassages;
+    }
+
+    public void setTotalNewMassages(int totalNewMassages) {
+        this.totalNewMassages = totalNewMassages;
+    }
+
+    public Need getNeed() {
+        return need;
+    }
+
+    public void setNeed(Need need) {
+        this.need = need;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+}

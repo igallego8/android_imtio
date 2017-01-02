@@ -1,0 +1,61 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.agora.need.NeedInfoActivity">
+
+    <include
+        android:id="@+id/need_tool_bar"
+        layout="@layout/tool_bar"
+        />
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/need_fragment_ad"
+        android:layout_below="@+id/need_tool_bar"
+        android:id="@+id/linearLayout"
+        >
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@drawable/toolbar_dropshadow" />
+
+
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/fLayout"
+            android:background="@color/gray300">
+
+
+        </FrameLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/need_recycler_view"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
+
+    </LinearLayout>
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:name="com.agora.ad.adFragment"
+        android:id="@+id/need_fragment_ad"
+
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        />
+
+
+</RelativeLayout>
+<!-- From: file:/Users/Ivan/Documents/projects/Agora/app/src/main/res/layout/activity_need_info.xml -->

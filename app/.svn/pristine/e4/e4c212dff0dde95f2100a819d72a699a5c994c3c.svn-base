@@ -1,0 +1,125 @@
+package com.agora.app;
+
+import android.app.Application;
+import android.content.Context;
+import android.graphics.Bitmap;
+
+import com.agora.R;
+import com.agora.db.FactoryDBHelper;
+import com.agora.entity.Bid;
+import com.agora.entity.Need;
+import com.agora.entity.User;
+import com.agora.util.listadapter.Item;
+import com.facebook.drawee.backends.pipeline.Fresco;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by Ivan on 25/09/15.
+ */
+public class AppContext extends Application {
+
+    private static   Context mContext;
+    private  List<Bitmap> attachedImages= new ArrayList<>();
+    private  List<Bitmap> thumbnailImages= new ArrayList<>();
+    private  List<String> imageURIs= new ArrayList<>();
+    private  boolean attachedImagesConfirmed=false;
+    private  List<Need> needs= new ArrayList<>();
+    private  List<Bid> bids= new ArrayList<>();
+    public  static FactoryDBHelper dbHelper;
+    public  static final  Item[] BID_ITEM_OPTIONS = new Item[2];
+
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public static Context getmContext() {
+        return mContext;
+    }
+
+    public static void setmContext(Context mContext) {
+        AppContext.mContext = mContext;
+    }
+
+    public List<Bitmap> getAttachedImages() {
+        return attachedImages;
+    }
+
+    public void setAttachedImages(List<Bitmap> attachedImages) {
+        this.attachedImages = attachedImages;
+    }
+
+    public List<Bitmap> getThumbnailImages() {
+        return thumbnailImages;
+    }
+
+    public void setThumbnailImages(List<Bitmap> thumbnailImages) {
+        this.thumbnailImages = thumbnailImages;
+    }
+
+    public List<String> getImageURIs() {
+        return imageURIs;
+    }
+
+    public void setImageURIs(List<String> imageURIs) {
+        this.imageURIs = imageURIs;
+    }
+
+    public boolean isAttachedImagesConfirmed() {
+        return attachedImagesConfirmed;
+    }
+
+    public void setAttachedImagesConfirmed(boolean attachedImagesConfirmed) {
+        this.attachedImagesConfirmed = attachedImagesConfirmed;
+    }
+
+    public List<Need> getNeeds() {
+        return needs;
+    }
+
+    public void setNeeds(List<Need> needs) {
+        this.needs = needs;
+    }
+
+    public List<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(List<Bid> bids) {
+        this.bids = bids;
+    }
+
+    public FactoryDBHelper getDbHelper() {
+        return dbHelper;
+    }
+
+    public void setDbHelper(FactoryDBHelper dbHelper) {
+        this.dbHelper = dbHelper;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mContext = this;
+        Fresco.initialize(mContext);
+        dbHelper= new FactoryDBHelper( mContext,AppConfig.DATABASE_NAME,null,AppConfig.DATABASE_VERSION);
+        BID_ITEM_OPTIONS[0]= new Item(AppContext.mContext.getResources().getString(R.string.inappropriate_content),
+                AppContext.mContext.getResources().getString(R.string.report_inappropriate_content),R.drawable.ic_control_point_black_24dp);
+        BID_ITEM_OPTIONS[1]= new Item(AppContext.mContext.getResources().getString(R.string.hide_bid),
+                AppContext.mContext.getResources().getString(R.string.hide_bid_from_list),R.drawable.ic_control_point_black_24dp);
+
+    }
+
+    public static Context getContext(){
+        return mContext;
+    }
+}
+
+

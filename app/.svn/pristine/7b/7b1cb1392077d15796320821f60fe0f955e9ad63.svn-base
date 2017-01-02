@@ -1,0 +1,169 @@
+package com.agora.need;
+
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.NotificationManager;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.util.Base64;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.entity.Category;
+import com.agora.entity.Need;
+import com.agora.util.NeedType;
+
+import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link NeedDetailFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link NeedDetailFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class NeedDetailFragment extends Fragment {
+
+    private EditText expirationDate;
+    private EditText description;
+    private TextView imagesLoaded;
+    private CheckBox shippingService;
+    private CheckBox paymentOnSiteService;
+    private CheckBox paymentCreditCard;
+    private Date expDate;
+
+    private Activity activity;
+    private Long categoryKey;
+
+    private OnFragmentInteractionListener mListener;
+
+    public NeedDetailFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_need_new_description, container, false);
+
+    }
+
+    public static NeedDetailFragment newInstance(Integer needPosition) {
+        NeedDetailFragment fragment = new NeedDetailFragment();
+        Bundle args = new Bundle();
+        args.putInt("needPosition", needPosition);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onViewCreated(View view,  Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        imagesLoaded=(TextView)view.findViewById(R.id.tv_images_loaded);
+        description=(EditText)view.findViewById(R.id.et_description);
+        shippingService=(CheckBox)view.findViewById(R.id.cb_shipping_service);
+        paymentCreditCard=(CheckBox)view.findViewById(R.id.cb_payment_credit_card);
+        paymentOnSiteService=(CheckBox)view.findViewById(R.id.cb_payment_on_site);
+        expirationDate = (EditText) view.findViewById(R.id.et_expiration_date);
+
+        Bundle bundle=getArguments();
+        if (bundle!=null) {
+            Integer needPosition =bundle.getInt("needPosition");
+            if (needPosition != null && needPosition!=-1) {
+                Need need= AppContext.needs.get(needPosition);
+                if (need.getDetial() != null) {
+                    shippingService.setChecked(need.getDetial().isShippingSevice());
+                    paymentOnSiteService.setChecked(need.getDetial().isPaymentOnsite());
+                    paymentCreditCard.setChecked(need.getDetial().isCreditcardPayment());
+                    expirationDate.setText(AppConfig.dateFormatter.format(need.getExpirationDate()));
+                    description.setText(need.getDescription());
+                    shippingService.setEnabled(false);
+                    paymentOnSiteService.setEnabled(false);
+                    paymentCreditCard.setEnabled(false);
+                    description.setEnabled(false);
+                    expirationDate.setEnabled(false);
+                }
+
+            }
+        }
+    }
+
+    public void onResume(){
+        super.onResume();
+        if(AppContext.attachedImagesConfirmed) {
+            imagesLoaded.setVisibility(View.VISIBLE);
+            imagesLoaded.setText(R.string.some_image_attach);
+
+        }else{
+            imagesLoaded.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onActivityCreated( Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+
+    }
+
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity=activity;
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        public void onFragmentInteraction(Uri uri);
+    }
+
+}

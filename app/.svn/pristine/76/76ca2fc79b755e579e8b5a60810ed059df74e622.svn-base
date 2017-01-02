@@ -1,0 +1,105 @@
+package com.agora.entity;
+
+import java.io.Serializable;
+
+/**
+ * Created by Ivan on 18/09/15.
+ */
+public class Deal implements Serializable {
+
+    private Long dealKey;
+    private String status;
+    private Long bidKey;
+    private Long needKey;
+    private Long date;
+    private Company company;
+    private User user;
+
+    public Long getDealKey() {
+        return dealKey;
+    }
+
+    public void setDealKey(Long dealKey) {
+        this.dealKey = dealKey;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Long getBidKey() {
+        return bidKey;
+    }
+
+    public void setBidKey(Long bidKey) {
+        this.bidKey = bidKey;
+    }
+
+    public Long getNeedKey() {
+        return needKey;
+    }
+
+    public void setNeedKey(Long needKey) {
+        this.needKey = needKey;
+    }
+
+    public Long getDate() {
+        return date;
+    }
+
+    public void setDate(Long date) {
+        this.date = date;
+    }
+
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("deal:{");
+        if (needKey != null) {
+            buffer.append("dealKey:").append(needKey).append(",");
+        }
+        if (status!=null) {
+            buffer.append("status:").append(status).append(",");
+        }
+
+        if (date != null) {
+            buffer.append(date.toString()).append(",");
+        }
+
+        if (company != null) {
+            buffer.append(company.toString()).append(",");
+        }
+        if (user != null) {
+            buffer.append(user.toString()).append(",");
+        }
+        if (needKey != null) {
+            buffer.append("needKey:").append(needKey.longValue()).append(",");
+        }
+        if (bidKey != null) {
+            buffer.append("bidKey:").append(bidKey.longValue());
+        }
+
+        buffer.append("}");
+        return buffer.toString();
+    }
+}

@@ -1,0 +1,74 @@
+package com.agora.main.drawer;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.agora.R;
+
+
+public class DrawerItemAdapter extends ArrayAdapter<DrawerItem> {
+
+	private final Context context;
+	private final int rowResourceId;
+	private DrawerItem[] items;
+
+	public void setItems(DrawerItem[] i) {
+		this.items = i;
+	}
+
+	public DrawerItemAdapter(Context context, int textViewResourceId, DrawerItem[] items) {
+		super(context, textViewResourceId, items);
+		this.context = context;
+		this.rowResourceId = textViewResourceId;
+		this.items = items;
+	}
+
+	@Override
+	public View getView(final int position, View convertView, ViewGroup parent) {
+		LayoutInflater inflater = (LayoutInflater) context
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View rowView = inflater.inflate(rowResourceId, parent, false);
+
+		DrawerItem item = items[position];
+		TextView textView = (TextView) rowView.findViewById(R.id.drawer_item_text);
+		String itemName = context.getResources().getString(item.getName());
+		textView.setText(itemName);
+		switch (position){
+			case 0:
+				rowView.setBackgroundColor(context.getResources().getColor(R.color.primary));
+				textView.setTextColor(context.getResources().getColor(R.color.white));
+				ViewGroup.LayoutParams param = rowView.getLayoutParams();
+				param.height=context.getResources().getDimensionPixelSize(R.dimen.drawer_header_height);
+				ImageView image = (ImageView) rowView.findViewById(R.id.drawer_item_img);
+				image.setImageResource(item.getIcon());
+				image.setBackgroundColor(rowView.getResources().getColor(R.color.primary));
+				textView.setText(null);
+				break;
+			case 2:
+			case 4:
+			case 6:
+				rowView.setBackgroundColor(context.getResources().getColor(R.color.primary));
+				textView.setTextColor(context.getResources().getColor(R.color.white));
+				ViewGroup.LayoutParams param2 = rowView.getLayoutParams();
+				param2.height=context.getResources().getDimensionPixelSize(R.dimen.drawer_title_height);
+				break;
+			default:
+				ImageView imageView = (ImageView) rowView.findViewById(R.id.drawer_item_icon);
+				imageView.setImageResource(item.getIcon());
+				textView.setTextSize(context.getResources().getDimension(
+						R.dimen.drawer_text_item_size));
+
+		}
+		return rowView;
+
+	}
+
+}

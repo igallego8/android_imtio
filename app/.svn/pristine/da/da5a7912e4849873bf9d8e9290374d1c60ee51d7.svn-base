@@ -1,0 +1,114 @@
+package com.agora.entity;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by Ivan on 14/09/15.
+ */
+public class Need implements Serializable {
+
+    private Long needKey;
+    private Topic topic;
+    private Date expirationDate;
+    private String description;
+    private Date settlementDate;
+    private List<Bid> bids=new ArrayList<>();
+    private NeedDetail detail;
+    private int messagesNumber;
+    private int bidsNumber;
+    private char type;
+
+    public Need(Long key,String description, char type){
+        needKey = key;
+        this.description=description;
+        this.type=type;
+    }
+
+    public Need(Long key, Topic topic, Date expirationDate ,Date settlementDate, int msgNbr, int bidsNbr,String description, char type){
+        needKey = key;
+        this.topic=topic;
+        this.expirationDate=expirationDate;
+        this.settlementDate =settlementDate;
+        this.messagesNumber=msgNbr;
+        this.bidsNumber=bidsNbr;
+        this.description=description;
+        this.type=type;
+    }
+
+
+
+    public Date getSettlementDate() {
+        return settlementDate;
+    }
+
+    public void setSettlementDate(Date settlementDate) {
+        this.settlementDate = settlementDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(Topic topic) {
+        this.topic = topic;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public Long getNeedKey() {
+        return needKey;
+    }
+
+    public void setNeedKey(Long needKey) {
+        this.needKey = needKey;
+    }
+
+    public List<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(List<Bid> bids) {
+        this.bids = bids;
+    }
+
+    public NeedDetail getDetial() {
+        return detail;
+    }
+
+    public void setDetial(NeedDetail detial) {
+        this.detail = detial;
+    }
+
+    public int getMessagesNumber() {
+        return messagesNumber;
+    }
+
+    public void setMessagesNumber(int messagesNumber) {
+        this.messagesNumber = messagesNumber;
+    }
+
+    public int getBidsNumber() {
+        return bidsNumber;
+    }
+
+    public void setBidsNumber(int bidsNumber) {
+        this.bidsNumber = bidsNumber;
+    }
+}

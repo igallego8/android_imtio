@@ -1,0 +1,253 @@
+package com.agora.need;
+
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+
+
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.os.Bundle;
+
+import android.support.v7.widget.SearchView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import com.agora.R;
+import com.agora.app.ActivityToolBarProgress;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.category.CategoryListActivity;
+import com.agora.image.ImageDialogFragment;
+import com.agora.listener.ProgressBarStateListener;
+import com.agora.main.drawer.DrawerItemAdapter;
+import com.agora.main.drawer.DrawerItemBuilder;
+import com.agora.main.drawer.DrawerItemClickListener;
+import com.agora.msg.MessageListActivity;
+import com.agora.shell.fab.ActionButton;
+import com.agora.util.popup.DontAskContentDialog;
+import com.agora.util.popup.ImageDontAskDialogFragment;
+
+import java.util.ArrayList;
+
+
+public class NeedListActivity extends ActivityToolBarProgress implements ProgressBarStateListener {
+
+    private TextView barNotificationMsgNbr;
+    private DrawerLayout mDrawerLayout;
+    protected ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mTitle, mDrawerTitle;
+    private Activity activity;
+    private ActionButton newNeedButton;
+    private Animation makeOutAnimation;
+    private Animation makeInAnimation;
+    private ArrayList<DontAskContentDialog> content=new ArrayList<>();
+
+    private ImageDontAskDialogFragment d;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_need_list);
+        super.onCreate();
+
+        mTitle = getTitle();
+        mDrawerTitle = getTitle();
+        activity= this;
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+                GravityCompat.START);
+        DrawerItemAdapter adapter = new DrawerItemAdapter(this, R.layout.drawer_item,
+                DrawerItemBuilder.getInstance().getItems());
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.setAdapter(adapter);
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener(this));
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+              //  R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+        ) {
+            public void onDrawerClosed(View view) {
+                getSupportActionBar().setTitle(mTitle);
+                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+            public void onDrawerOpened(View drawerView) {
+                getSupportActionBar().setTitle(mDrawerTitle);
+                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_drawer);
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getSupportActionBar().setHomeButtonEnabled(true);
+        newNeedButton=(ActionButton)this.findViewById(R.id.bt_new_need);
+        makeOutAnimation = AnimationUtils.makeOutAnimation(getBaseContext(), true);
+        newNeedButton.setVisibility(View.INVISIBLE);
+        makeInAnimation = AnimationUtils.makeInAnimation(getBaseContext(), false);
+        newNeedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newNeedButton.setVisibility(View.INVISIBLE);
+                NeedTypeDialog dialog = new NeedTypeDialog(NeedListActivity.this);
+                dialog.show();
+               /* Intent intent = new Intent(activity, NeedCreateActivity.class);
+                AppContext.attachedImages.clear();
+                AppContext.attachedImagesConfirmed=false;
+                activity.startActivity(intent);*/
+
+            }
+        });
+
+
+        makeInAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+                newNeedButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+
+        makeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                newNeedButton.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+        });
+
+        if (savedInstanceState==null && d==null){
+            setDialogContent();
+            SharedPreferences settings=  PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+            String skipMessage = settings.getString(AppConfig.PREF_KEY_SKIP_NEED_TUTORIAL, "NOT checked");
+            if (!skipMessage.equals("checked")) {
+                FragmentManager fm = getFragmentManager();
+                d =  ImageDontAskDialogFragment.newInstance(content);
+                d.show(fm, "fragment_image_dont_ask");
+            }
+        }
+
+    }
+
+    Handler handler = new Handler();
+
+
+
+    protected void setDialogContent(){
+        content.add(new DontAskContentDialog(R.drawable.screenshot_1,"http://104.236.29.211",getResources().getString(R.string.look_need_info)));
+        content.add(new DontAskContentDialog(R.drawable.screenshot_1,"http://104.236.29.211",getResources().getString(R.string.look_bid_info)));
+        content.add(new DontAskContentDialog(R.drawable.screenshot_1,"http://104.236.29.211",getResources().getString(R.string.look_new_need)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_need_list, menu);
+        return true;
+    }
+
+    public void updateBarNotificationMsgNbr(final int number){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (number == 0) {
+                    barNotificationMsgNbr.setVisibility(View.INVISIBLE);
+                } else {
+                    barNotificationMsgNbr.setVisibility(View.VISIBLE);
+                    barNotificationMsgNbr.setText(Integer.toString(number));
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        switch (id){
+            case R.id.action_settings:
+                return true;
+            case android.R.id.home:
+                if(mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                }
+                else {
+                    mDrawerLayout.openDrawer(mDrawerList);
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void setProgressState(int state) {
+        setProgressBarStatus(state);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    protected void onResume(){
+        super.onResume();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("MyCoordinator", "Toggle animation");
+                newNeedButton.startAnimation(makeInAnimation);
+            }
+        }, 500);
+
+    }
+
+    public void onPause(){
+        super.onPause();
+        newNeedButton.setVisibility(View.INVISIBLE);
+    }
+
+
+}
+
+

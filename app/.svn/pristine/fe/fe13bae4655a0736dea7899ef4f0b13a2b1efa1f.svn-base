@@ -1,0 +1,187 @@
+package com.agora.category;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.bid.BidListActivity;
+import com.agora.entity.Category;
+import com.agora.entity.Need;
+import com.agora.image.ImageAttachActivity;
+import com.agora.listener.OnItemTouchListener;
+import com.agora.msg.MessageListActivity;
+import com.agora.need.NeedNeedDescriptionActivity;
+import com.agora.util.BackgroundItemColor;
+import com.agora.util.UtilProcess;
+
+import java.util.List;
+
+/**
+ * Created by Ivan on 13/09/15.
+ */
+public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapter.ViewHolder> {
+    private List<Category> mDataset;
+    private  OnItemTouchListener onItemTouchListener;
+    private  OnAdapterInteractionListener onAdapterInteractionListener;
+
+
+
+    // Provide a reference to the views for each data item
+    // Complex data items may need more than one view per item, and
+    // you provide access to all the views for a data item in a view holder
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public View view;
+
+        public ViewHolder(View v) {
+            super(v);
+            view = v;
+        }
+    }
+
+    public CategoryListAdapter(List<Category> myDataset, OnItemTouchListener onItemTouchListener,OnAdapterInteractionListener onAdapterInteractionListener) {
+        this.mDataset = myDataset;
+        this.onItemTouchListener=onItemTouchListener;
+        this.onAdapterInteractionListener=onAdapterInteractionListener;
+    }
+
+    public void setList(List<Category> myDataset){
+        this.mDataset=myDataset;
+    }
+
+    @Override
+    public CategoryListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                   int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.cv_category_item, parent, false);
+        ViewHolder vh = new ViewHolder(v);
+        return vh;
+    }
+
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(final ViewHolder holder,final int position) {
+
+        CardView card= (CardView) holder.view.findViewById(R.id.card_view);
+        card.setOnClickListener(new CardView.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                AdpaterAsyncTask task= new AdpaterAsyncTask();
+                task.execute();
+
+            }
+
+             class AdpaterAsyncTask extends AsyncTask<Void, Void,   List<Category> > {
+                @Override
+                protected void onPostExecute(final  List<Category> result ) {
+                    final AlertDialog.Builder alertDialog = new AlertDialog.Builder(holder.view.getContext());
+                    LayoutInflater inflater = (LayoutInflater) holder.view.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View convertView = (View) inflater.inflate(R.layout.alert_list, null);
+                    alertDialog.setView(convertView);
+                    alertDialog.setTitle(R.string.title_dialog_category_list);
+                    ListView lv = (ListView) convertView.findViewById(R.id.alert_list);
+                    String[] l= new String[result.size()];
+                    for (int x=0;x<result.size();x++){
+                        l[x]=result.get(x).getDescription();
+                    }
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(holder.view.getContext(),android.R.layout.simple_list_item_1,l);
+                    lv.setAdapter(adapter);
+                    final AlertDialog optionDialog=alertDialog.create();
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            Intent intent = new Intent(view.getContext(), NeedNeedDescriptionActivity.class);
+                            intent.putExtra(AppConfig.CATEGORY_KEY, result.get(position).getCategoryKey());
+                            intent.setAction(Intent.ACTION_VIEW);
+                            holder.view.getContext().startActivity(intent);
+                            optionDialog.dismiss();
+
+                        }
+                    });
+                    Message msg = handler.obtainMessage();
+                    msg.arg1 = AppConfig.PROGRESS_STOP;
+                    handler.sendMessage(msg);
+
+                    optionDialog.show();
+
+                }
+
+                @Override
+                protected void onPreExecute() {
+                    // start loading animation maybe?
+                    //mAdapter.clear(); // clear "old" entries (optional)
+                    Message msg = handler.obtainMessage();
+                    msg.arg1 = AppConfig.PROGRESS_RUNNING;
+                    handler.sendMessage(msg);
+
+                }
+
+                @Override
+                protected  List<Category>  doInBackground(Void... params) {
+                    // everything in here gets executed in a separate thread
+                    List<Category> list=  AppConfig.dataProvider.fetchSubCategories(mDataset.get(position).getCategoryKey());
+                    return list;
+                }
+
+
+            }
+
+        });
+        TextView t = (TextView) holder.view.findViewById(R.id.category_description);
+        t.setText(mDataset.get(position).getDescription());
+        BackgroundItemColor color =UtilProcess.getRandomColor();
+        RelativeLayout layout = (RelativeLayout) holder.view.findViewById(R.id.layout_icon);
+        layout.setBackgroundColor(color.getColor1());
+        ImageView image =  (ImageView) holder.view.findViewById(R.id.category_logo);
+        image.setImageBitmap(mDataset.get(position).getImage());
+
+    }
+
+    // Return the size of your dataset (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        return mDataset.size();
+    }
+
+
+    public interface OnAdapterInteractionListener {
+
+        public void setProgressState(int state);
+    }
+
+    // Define the Handler that receives messages from the thread and update the progress
+    final Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            int current = msg.arg1;
+            if(onAdapterInteractionListener!=null) {
+                if (current == AppConfig.PROGRESS_STOP) {
+                    onAdapterInteractionListener.setProgressState(AppConfig.PROGRESS_STOP);
+                } else {
+                    onAdapterInteractionListener.setProgressState(AppConfig.PROGRESS_RUNNING);
+                }
+            }
+        }
+    };
+
+}

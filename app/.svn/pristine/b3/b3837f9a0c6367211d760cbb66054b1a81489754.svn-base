@@ -1,0 +1,453 @@
+package com.agora.data;
+
+import android.graphics.Bitmap;
+
+import com.agora.app.AppConfig;
+import com.agora.builder.BidDetailBuilder;
+import com.agora.builder.BuilderFactory;
+import com.agora.builder.CategoryBuilder;
+import com.agora.builder.NeedBuilder;
+import com.agora.builder.NeedDetailBuilder;
+import com.agora.builder.BidBuilder;
+import com.agora.db.dao.NeedDAO;
+import com.agora.entity.Auth;
+import com.agora.entity.BidDetail;
+import com.agora.entity.Category;
+import com.agora.entity.Conversation;
+import com.agora.entity.Bid;
+import com.agora.entity.Client;
+import com.agora.entity.Company;
+import com.agora.entity.Deal;
+import com.agora.entity.Employee;
+import com.agora.entity.Message;
+import com.agora.entity.Msg;
+import com.agora.entity.Need;
+import com.agora.entity.NeedDetail;
+import com.agora.entity.Topic;
+import com.agora.entity.User;
+import com.agora.http.HTTPRequest;
+import com.agora.http.json.HTTPJSONRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by Ivan on 17/09/15.
+ */
+public class WSDataProvider implements IDataProvider {
+
+
+
+    @Override
+    public JSONObject getCategoryPrediction(String... params) {
+        //Make a call to WS and it returns json
+        JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL+"categorypredictions"+"?suffix="+params[0]);
+        return  reader;
+
+    }
+
+    @Override
+    public List<Category> fetchProductCategories() {
+        JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL + "fetchProductCategories");
+        List<Category> list= new ArrayList<>();
+        try {
+            if (reader==null){
+                //Mostrar erorr que no hay connection WS
+            }else {
+                 JSONArray array = reader.getJSONArray("categories");
+                for (int n = 0; n < array.length(); n++) {
+                    JSONObject jsonNeed = array.getJSONObject(n);
+                    Category category = (Category) BuilderFactory.getBuilder(CategoryBuilder.class.getName()).build(jsonNeed);
+                   // Bitmap image= HTTPRequest.requestImageHttpGet("http://104.236.29.211:8181/agora/images/"+category.getImageName());
+                   // category.setImage(image);
+                    if (category != null) ;
+                    list.add(category);
+                 }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return  list;
+    }
+
+    @Override
+    public List<Category> fetchSubCategories(Long categoryKey) {
+        JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL + "fetchProductSubCategories?categoryKey="+categoryKey);
+        List<Category> list= new ArrayList<>();
+        try {
+            if (reader==null){
+                //Mostrar erorr que no hay connection WS
+            }else {
+                JSONArray array = reader.getJSONArray("categories");
+                for (int n = 0; n < array.length(); n++) {
+                    JSONObject jsonNeed = array.getJSONObject(n);
+                    Category category = (Category) BuilderFactory.getBuilder(CategoryBuilder.class.getName()).build(jsonNeed);
+                    if (category != null) ;
+                    list.add(category);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return  list;
+    }
+
+    @Override
+    public List<Need> fetchNeedsByUserKey(Long userKey) {
+        JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL+"fetchNeedsByUserKey"+"?userKey="+userKey);
+        List<Need> list =  new ArrayList<>();
+        try {
+            if (reader==null){
+
+            }else {
+               JSONArray array = reader.getJSONArray("needs");
+                for (int n = 0; n < array.length(); n++) {
+                   JSONObject jsonNeed = array.getJSONObject(n);
+                    Need need = (Need) BuilderFactory.getBuilder(NeedBuilder.class.getName()).build(jsonNeed);
+                    Bitmap image= HTTPRequest.requestImageHttpGet(AppConfig.IMAGES_URL + need.getCategory().getImageName());
+                    need.getCategory().setImage(image);
+                    if (need != null) ;
+                    list.add(need);
+
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return list;
+
+    }
+
+    @Override
+    public Need fetchNeedByNeedKey(Long needKey) {
+        if (needKey!=null || needKey!=0) {
+            JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL + "need" + "?needKey=" + needKey);
+            try {
+                if (reader != null) {
+                    JSONObject jsonNeed = reader.getJSONObject("need");
+                    Need need = (Need) BuilderFactory.getBuilder(NeedBuilder.class.getName()).build(jsonNeed);
+                    return need;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void bidsRead(Long needKey) {
+        if (needKey!=null || needKey!=0) {
+            JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL + "bidsRead" + "?needKey=" + needKey);
+            try {
+                if (reader != null) {
+                    reader.getLong("result");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void messagesRead(Long needKey, Integer messagesNumber) {
+        if (needKey!=null || needKey!=0) {
+            JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL + "messagesRead" + "?needKey=" + needKey+"&messagesNumber="+messagesNumber);
+            try {
+                if (reader != null) {
+                    reader.getLong("result");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public Need findNeedByNeedKey(Long needKey) {
+        //Make a call to WS and it returns json
+        if (needKey!=null || needKey!=0) {
+            JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL + "needs" + "?needKey=" + needKey);
+            try {
+                if (reader != null) {
+                    JSONObject jsonNeed = reader.getJSONObject("need");
+                    Need need = (Need) BuilderFactory.getBuilder(NeedBuilder.class.getName()).build(jsonNeed);
+                    return need;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void getNeedDetail( Need need) {
+        JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL+"needDetail"+"?needKey="+need.getNeedKey());
+        try {
+            JSONObject jsonNeed = reader.getJSONObject("need");
+            need=(Need)BuilderFactory.getBuilder(NeedBuilder.class.getName()).build(jsonNeed) ;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void uploadImage(HashMap<String, String> params) {
+        HTTPJSONRequest.uploadImage(AppConfig.WS_URL+"uploadImageBase64",params);
+    }
+
+    @Override
+    public void uploadImage(FileInputStream stream) {
+
+    }
+
+    @Override
+    public Long sendMessage(Msg msg) {
+        String jsonRq="{"+msg.toString()+"}";
+        JSONObject reader = HTTPJSONRequest.requestHttpPost(AppConfig.WS_URL + "sendMsg", jsonRq);
+        try {
+            Long key=reader.getLong("result");
+            return key;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return -1L;
+    }
+
+    @Override
+    public void setMessageStatus(Long messageKey, String status) {
+        JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL + "setMsgStatus" + "?messageKey=" + messageKey + "&status=" + status);
+        try {
+            Long key=reader.getLong("result");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public User signIn(Auth auth) {
+        String jsonRq="{"+auth.toString()+"}";
+        JSONObject reader = HTTPJSONRequest.requestHttpPost(AppConfig.WS_URL + "signIn", jsonRq);
+        try {
+            Long userKey=reader.getLong("userKey");
+            String name=reader.getString("userName");
+            String lastName=reader.getString("lastName");
+            Client user = new Client();
+            user.setUserKey(userKey);
+            user.setName(name);
+            user.setLastName(lastName);
+            user.setAuth(auth);
+            return user;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    @Override
+    public Long createNeed(Need need, Long userKey) {
+        String jsonRq="{"+need.toString()+"}";
+        jsonRq= jsonRq.replace("\n", " ").replace("\r", " ");
+        JSONObject reader = HTTPJSONRequest.requestHttpPost(AppConfig.WS_URL + "createNeed", jsonRq);
+        try {
+            Long key=reader.getLong("result");
+            return key;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0L;
+    }
+
+    @Override
+    public boolean deleteNeedByNeedKey(Long needKey) {
+        if (needKey!=null || needKey!=0) {
+            JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL + "deleteNeedByNeedKey" + "?needKey=" + needKey);
+            try {
+                if (reader != null) {
+                    Long key=reader.getLong("result");
+                    if (key==0){
+                        return true;
+                    }
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+
+    }
+
+    @Override
+    public List<Conversation> fetchConversationByUserKey(Long userKey) {
+        return null;
+    }
+
+    @Override
+    public List<Conversation> fetchConversationByCompanyKey(Long companyKey) {
+        return null;
+    }
+
+    @Override
+    public List<Message> fetchMessagesByNeedKey(Long needKey) {
+        return null;
+    }
+
+    @Override
+    public List<Conversation> fetchConversationByNeedKey(Long needKey) {
+        return null;
+    }
+
+    @Override
+    public void sendClientMessage(Message message, Need need, Client client) {
+
+    }
+
+    @Override
+    public void sendCompanyMessage(Message message, Need need, Employee employee) {
+
+    }
+
+    @Override
+    public Bid findBidbyBidKey(Long bidKey) {
+        return null;
+    }
+
+    @Override
+    public List<Bid> fetchBidByNeedKey(Need need) {
+        JSONObject reader = HTTPJSONRequest.requestHttpGet(AppConfig.WS_URL+"fetchBidsByNeedKey"+"?needKey="+need.getNeedKey());
+        List<Bid> list =  new ArrayList<>();
+        try {
+            if (reader==null){
+
+            }else {
+                JSONArray array = reader.getJSONArray("bids");
+                for (int n = 0; n < array.length(); n++) {
+                    JSONObject jsonNeed = array.getJSONObject(n);
+                    Bid bid = (Bid) BuilderFactory.getBuilder(BidBuilder.class.getName()).build(jsonNeed);
+                    if (bid != null) ;
+                    list.add(bid);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return list;
+
+
+    }
+
+    @Override
+    public List<Bid> fetchBidByCompanyKey(Long compnayKey) {
+        return null;
+    }
+
+    @Override
+    public boolean createBid(Bid bid, Long User) {
+        return false;
+    }
+
+    @Override
+    public boolean deleteBidByBidKey(Long bidKey) {
+        return false;
+    }
+
+    @Override
+    public Bid findBidByBidKey(Long userKey) {
+        return null;
+    }
+
+    @Override
+    public boolean createDeal(Deal deal) {
+        return false;
+    }
+
+    @Override
+    public boolean cancelDealByDealKey(Long deal) {
+        return false;
+    }
+
+    @Override
+    public List<Deal> fetchDealsByUserKey(Long userKey) {
+        return null;
+    }
+
+    @Override
+    public List<Deal> fetchDealByCompanyKey(Long companyKey) {
+        return null;
+    }
+
+    @Override
+    public Deal findDealByDealKey(Long dealKey) {
+        return null;
+    }
+
+    @Override
+    public List<Company> fetchFavoritiesByUserKey(Long userKey) {
+        return null;
+    }
+
+    @Override
+    public void setFavorityCompany(Long companyKey, Long userKey) {
+
+    }
+
+    @Override
+    public boolean login(String id, String password) {
+        return false;
+    }
+
+    @Override
+    public boolean createAccount(Client client) {
+        return false;
+    }
+
+    @Override
+    public Client findClientByUserKey(Long userKey) {
+        return null;
+    }
+
+    @Override
+    public List<Topic> fetchTopics() {
+        return null;
+    }
+
+    @Override
+    public void notifyMessagesRead(List<Long> messageKeys) {
+
+    }
+
+    @Override
+    public void notifyMessagesReceived(Long messageKey) {
+
+    }
+
+    @Override
+    public byte[] imageLowQuality(String file) {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] imageHighQuality(String file) {
+        return new byte[0];
+    }
+
+    @Override
+    public Bitmap getBitmap(String urlString) {
+        return HTTPRequest.requestImageHttpGet(urlString);
+    }
+}

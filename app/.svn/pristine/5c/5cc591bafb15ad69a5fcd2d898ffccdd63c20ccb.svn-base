@@ -1,0 +1,31 @@
+package com.agora.builder;
+
+import com.agora.entity.Need;
+import com.agora.entity.Topic;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Date;
+
+/**
+ * Created by Ivan on 18/09/15.
+ */
+public class NeedBuilder implements Builder {
+    @Override
+    public Object build(JSONObject o) throws JSONException {
+
+            Long key=Long.valueOf(o.getString("needKey"));
+            JSONObject jsonTopic= o.getJSONObject("topic");
+            String description= o.getString("description");
+            Topic topic = (Topic) BuilderFactory.getBuilder(TopicBuilder.class.getName()).build(jsonTopic);
+            Date expirationDate= new Date(o.getLong("expirationDate"));
+            Date settlementDate= new Date(o.getLong("settlementDate"));
+            int msgNumber=o.getInt("messagesNumber");
+            int bidsNumber=o.getInt("bidsNumber");
+            char type=o.getString("type").charAt(0);
+            Need need= new Need(key,topic,expirationDate,settlementDate,msgNumber,bidsNumber,description,type);
+            return need;
+
+    }
+}

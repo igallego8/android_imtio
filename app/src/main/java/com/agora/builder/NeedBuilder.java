@@ -1,0 +1,60 @@
+package com.agora.builder;
+
+import com.agora.entity.Category;
+import com.agora.entity.Need;
+import com.agora.entity.Topic;
+import com.agora.util.UtilProcess;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * Created by Ivan on 18/09/15.
+ */
+public class NeedBuilder implements Builder {
+    @Override
+    public Object build(JSONObject o) throws JSONException {
+            Long key=Long.valueOf(o.getString("needKey"));
+            String description= o.getString("description");
+            String d= o.optString("expirationDate");
+            Date expirationDate=null;
+            if (d!=null && !d.trim().equals("")) {
+                    expirationDate = UtilProcess.getDate(d);
+            }
+            Date settlementDate= new Date(System.currentTimeMillis());// UtilProcess.getDate(o.optString("settlementDate"));
+            String amount= o.optString("maxAmount");
+            String image1= o.optString("image1");
+            String image2= o.optString("image2");
+            String image3= o.optString("image3");
+            Long dealKey= o.optLong("dealKey");
+            BigDecimal maxAmount=null;
+            if (amount!=null && !amount.trim().equals("")){
+                    maxAmount = new BigDecimal (amount);
+            }
+            int msgNumber=o.getInt("messagesNumber");
+            int bidsNumber=o.getInt("bidsNumber");
+            //Long userKey=o.getLong("userKey");
+           // String type=o.getString("type");
+            JSONObject jsonCategory= new JSONObject( o.get("category").toString());
+            Category category = (Category) BuilderFactory.getBuilder(CategoryBuilder.class.getName()).build(jsonCategory);
+            Need need= new Need();
+            need.setNeedKey(key);
+            //need.setUserKey(userKey);
+            need.setDealKey(dealKey);
+            need.setCategory(category);
+            need.setDescription(description);
+            need.setSettlementDate(settlementDate);
+            need.setExpirationDate(expirationDate);
+            need.setMessagesNumber(msgNumber);
+            need.setBidsNumber(bidsNumber);
+            //need.setType(type);
+            need.setImage1(image1);
+            need.setImage2(image2);
+            need.setImage3(image3);
+            return need;
+
+    }
+}

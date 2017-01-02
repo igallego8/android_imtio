@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionManager
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <transition
+        android:fromScene="@layout/fragment_login"
+        android:toScene="@layout/fragment_login_transition"
+        android:transition="@transition/slow_auto_transition"/>
+    <transition
+        android:fromScene="@layout/fragment_login"
+        android:toScene="@layout/fragment_login_transition"
+        android:transition="@transition/slow_auto_transition"/>
+
+</transitionManager>

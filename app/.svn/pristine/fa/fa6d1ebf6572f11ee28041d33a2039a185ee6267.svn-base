@@ -1,0 +1,144 @@
+package com.agora.msg;
+
+import android.content.Context;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.db.dao.ChatUserDAO;
+import com.agora.entity.Chat;
+import com.agora.entity.ChatUser;
+import com.agora.entity.Conversation;
+import com.agora.entity.User;
+import com.agora.listener.OnItemTouchListener;
+import com.agora.util.UtilProcess;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
+
+import java.util.List;
+
+/**
+ * Created by Ivan on 13/09/15.
+ */
+public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHolder> {
+
+    private List<Chat> mDataset;
+    private OnItemTouchListener onItemTouchListener;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public View view;
+        public ViewHolder(View v) {
+            super(v);
+            view = v;
+        }
+    }
+
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public ChatListAdapter(List<Chat> myDataset, OnItemTouchListener listener) {
+        this.mDataset = myDataset;
+        this.onItemTouchListener=listener;
+    }
+
+    // Create new views (invoked by the layout manager)
+    @Override
+    public ChatListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                   int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.cv_chat_item, parent, false);
+        ViewHolder vh = new ViewHolder(v);
+        return vh;
+    }
+
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        final Chat chat = mDataset.get(position);
+        RelativeLayout layoutChat = (RelativeLayout) holder.view.findViewById(R.id.layout_chat);
+        layoutChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemTouchListener.onCardViewTap(holder.view,chat.getChatKey(),0);
+            }
+        });
+        FrameLayout frameLogo= (FrameLayout)holder.view.findViewById(R.id.frame_logo);
+        SimpleDraweeView image= new  SimpleDraweeView(holder.view.getContext());
+        TextView userName= (TextView)holder.view.findViewById(R.id.tv_user_name);
+        TextView qtyMsg= (TextView)holder.view.findViewById(R.id.tv_qty_message);
+        TextView lastMsg= (TextView)holder.view.findViewById(R.id.tv_last_msg);
+        lastMsg.setText(chat.getLastTextMessage());
+        RelativeLayout statusLayout= (RelativeLayout)holder.view.findViewById(R.id.status_layout);
+        qtyMsg.setText("+"+chat.getQtyNewMessages());
+        if(chat.getQtyNewMessages()==0){
+            statusLayout.setVisibility(View.GONE);
+        }
+        Long userKey= chat.getUserKey();
+        //find user by user key
+        User u = new User();
+        u.setUserKey(userKey);
+        u.setLastName("Gallego");
+        u.setName("Ivan");
+        //check if user is employee, get company logo
+        //Company company=
+        String logo= "1.jpg";
+        if (logo!=null  && logo.trim().length()!=0) {
+            GenericDraweeHierarchyBuilder builder =
+                    new GenericDraweeHierarchyBuilder(holder.view.getResources());
+            GenericDraweeHierarchy hierarchy = builder
+                    .setFadeDuration(300)
+                    .setRoundingParams(new RoundingParams().setRoundAsCircle(true))
+                    .build();
+            Uri uri = Uri.parse(AppConfig.IMAGES_URL + logo);
+            image.setImageURI(uri);
+            image.setHierarchy(hierarchy);
+            image.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT));
+            frameLogo.addView(image);
+        }else{
+            TextView letterName= new TextView(holder.view.getContext());
+            letterName.setText("Company".substring(0, 1));
+            letterName.setBackgroundDrawable(UtilProcess.getRoundColorDrawable());
+            letterName.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT));
+            letterName.setTextAppearance(holder.view.getContext(), R.style.text_5);
+            letterName.setGravity(Gravity.CENTER);
+            frameLogo.addView(letterName);
+        }
+        userName.setText(u.getName() + " " +u.getLastName());
+    }
+
+
+    private class AdapterAsyncTask extends AsyncTask<Integer,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Integer... params) {
+            int userKey= params[0];
+            User user= AppConfig.dataProvider.findClientByUserKey((long)userKey);
+            return null;
+        }
+    }
+
+
+
+    // Return the size of your dataset (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        return mDataset.size();
+    }
+
+}

@@ -1,0 +1,175 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.agora.need.NeedDetailFragment"
+    android:padding="20dp">
+
+    <ScrollView
+        android:id="@+id/ScrollView01"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@color/white">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/et_description"
+            android:layout_gravity="center_horizontal|top"
+            />
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ScrollView01"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:id="@+id/layout_expiration_date">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:id="@+id/expiration_date_icon"
+                android:src="@drawable/ic_event_black_48dp"
+                android:layout_marginRight="20dp"
+                android:layout_centerVertical="true"
+                android:alpha="0.5"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/expiration_date"
+                android:layout_toRightOf="@+id/expiration_date_icon"
+                android:layout_centerVertical="true"
+                android:id="@+id/tv_expiration_date"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/et_expiration_date"
+                android:text="dd-mm-yyy"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:id="@+id/layout_shipping_service">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:id="@+id/shipping_service_icon"
+                android:src="@drawable/ic_local_shipping_black_48dp"
+                android:layout_marginRight="20dp"
+                android:layout_centerVertical="true"
+                android:alpha="0.5"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/shipping_service"
+                android:layout_toRightOf="@+id/shipping_service_icon"
+                android:layout_centerVertical="true"
+                android:id="@+id/tv_shipping_service"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cb_shipping_service"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:id="@+id/layout_payment_credit_card">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:id="@+id/payment_credit_card_icon"
+                android:src="@drawable/ic_payment_black_48dp"
+                android:layout_marginRight="20dp"
+                android:layout_centerVertical="true"
+                android:alpha="0.5"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/payment_credit_card"
+                android:layout_toRightOf="@+id/payment_credit_card_icon"
+                android:layout_centerVertical="true"
+                android:id="@+id/tv_payment_credit_card"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cb_payment_credit_card"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:id="@+id/layout_payment_on_site">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:id="@+id/payment_on_site_icon"
+                android:src="@drawable/ic_local_atm_black_48dp"
+                android:layout_marginRight="20dp"
+                android:layout_centerVertical="true"
+                android:alpha="0.5"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/payment_on_site"
+                android:layout_toRightOf="@+id/payment_on_site_icon"
+                android:layout_centerVertical="true"
+                android:id="@+id/tv_payment_on_site"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cb_payment_on_site"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_images_loaded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:padding="20dp"
+        android:gravity="center"/>
+
+</RelativeLayout>

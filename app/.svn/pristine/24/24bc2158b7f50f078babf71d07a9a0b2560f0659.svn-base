@@ -1,0 +1,47 @@
+package com.agora.entity;
+
+import java.io.Serializable;
+
+/**
+ * Created by Ivan on 17/09/15.
+ */
+public abstract class User implements Serializable {
+
+    private Long userKey;
+    private String name;
+    private String lastName;
+    private Auth auth;
+
+    public Long getUserKey() {
+        return userKey;
+    }
+
+    public void setUserKey(Long userKey) {
+        this.userKey = userKey;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+
+    public Auth getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Auth auth) {
+        this.auth = auth;
+    }
+}

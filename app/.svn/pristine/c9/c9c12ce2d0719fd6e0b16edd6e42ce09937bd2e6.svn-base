@@ -1,0 +1,73 @@
+package com.agora.main.drawer;
+
+public class DrawerItem {
+
+	private int name;
+	private String image;
+	private int color;
+	private int icon;
+
+	public DrawerItem(int name, int icon) {
+		this.icon = icon;
+		this.name = name;
+	}
+
+	public int getIcon() {
+		return icon;
+	}
+
+	public void setIcon(int icon) {
+		this.icon = icon;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public int getColor() {
+		return color;
+	}
+
+	public void setColor(int color) {
+		this.color = color;
+	}
+
+	public int getName() {
+		return name;
+	}
+
+	public void setName(int name) {
+		this.name = name;
+
+	}
+
+	public DrawerItem(int name, String image) {
+		this.image = image;
+		this.name = name;
+
+	}
+
+	public DrawerItem(int name, String image, int color) {
+		this.image = image;
+		this.name = name;
+		this.color = color;
+
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof DrawerItem)) {
+			return false;
+		}
+		DrawerItem aux = (DrawerItem) o;
+		if (this.getName()==(aux.getName())) {
+			return true;
+		}
+		return false;
+
+	}
+
+}

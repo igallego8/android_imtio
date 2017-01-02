@@ -1,0 +1,99 @@
+package com.agora.data;
+
+import android.graphics.Bitmap;
+
+import com.agora.entity.Auth;
+import com.agora.entity.Category;
+import com.agora.entity.Conversation;
+import com.agora.entity.Bid;
+import com.agora.entity.Client;
+import com.agora.entity.Company;
+import com.agora.entity.Deal;
+import com.agora.entity.Employee;
+import com.agora.entity.Message;
+import com.agora.entity.Msg;
+import com.agora.entity.Need;
+import com.agora.entity.ProductBid;
+import com.agora.entity.ServiceBid;
+import com.agora.entity.Topic;
+import com.agora.entity.User;
+
+import org.json.JSONObject;
+
+import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by Ivan on 17/09/15.
+ */
+public interface IDataProvider {
+
+    JSONObject getCategoryPrediction(String... params);
+    Company findCompanyByCompanyKey(Long companyKey);
+
+    List<Category> fetchProductCategories();
+    List<Category> fetchSubCategories(Long categoryKey);
+
+    List<Need> fetchNeedsByUserKey(Long userKey);
+    Need fetchNeedByNeedKey(Long needKey);
+
+    Deal findDealByNeedKey(Long needKey);
+
+    Long createDeal(Deal deal);
+    void  bidsRead(Long needKey);
+    void  messagesRead(Long needKey, Integer messagesNumber);
+
+    Need findNeedByNeedKey(Long needKey);
+    void getNeedDetail(Need need);
+    void uploadImage(HashMap<String,String> params);
+    void uploadImage(FileInputStream stream);
+
+    Long sendMessage(Msg msg);
+    void setMessageStatus(Long messageKey,String status);
+
+    User signIn(Auth auth);
+
+    Long createNeed(Need need, Long userKey);
+    boolean deleteNeedByNeedKey(Long needKey);
+
+    List<Conversation> fetchConversationByUserKey(Long userKey);
+    List<Conversation> fetchConversationByNeedKey(Long needKey);
+    List<Conversation> fetchConversationByCompanyKey(Long companyKey);
+    List<Message> fetchMessagesByNeedKey (Long needKey);
+    void sendClientMessage (Message message, Need need,Client client);
+    void sendCompanyMessage (Message message, Need need,Employee employee);
+
+
+    List<Bid> fetchBidByNeedKey (Long need);
+    List<Bid> fetchBidByCompanyKey(Long companyKey);
+
+    boolean createBid (Bid bid, Long User);
+    boolean deleteBidByBidKey(Long bidKey);
+    Bid findBidByBidKey(Long bidKey);
+
+    boolean cancelDealByDealKey(Long deal);
+    List<Deal> fetchDealsByUserKey(Long userKey);
+    List<Deal> fetchDealByCompanyKey(Long companyKey);
+    Deal findDealByDealKey(Long dealKey);
+
+    List<Company> fetchFavoritiesByUserKey(Long userKey);
+    void setFavorityCompany(Long companyKey, Long userKey);
+
+    boolean login(String id, String password);
+    boolean createAccount(Client client);
+    Long createUser(User user);
+    Client findClientByUserKey(Long userKey);
+    User findUserByUserKey(Long userKey);
+
+    List<Topic> fetchTopics();
+
+    void notifyMessagesRead(List<Long> messageKeys);
+    void notifyMessagesReceived(Long messageKey);
+
+    byte[] imageLowQuality(String file);
+    byte[] imageHighQuality(String file);
+
+    Bitmap getBitmap(String urlString);
+
+}

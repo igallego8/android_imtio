@@ -1,0 +1,6 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.agora.preference.NotificationPrefFragment">
+</FrameLayout>
+<!-- From: file:/Users/Ivan/Documents/projects/Agora/app/src/main/res/layout/fragment_notification_pref.xml -->

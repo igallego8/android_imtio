@@ -1,0 +1,84 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.agora.login.LoginActivity"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:weightSum="1"
+    android:background="@drawable/back1">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_marginTop="150dp">
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/et_email"
+            android:background="#99FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp" />
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/et_pass"
+            android:background="#99FFFFFF"
+            android:layout_alignBaseline="@+id/bt_new_account"
+            android:layout_alignBottom="@+id/bt_new_account"
+            android:layout_alignLeft="@+id/et_email"
+            android:layout_alignStart="@+id/et_email"
+            android:layout_marginBottom="20dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_login"
+            android:id="@+id/bt_login"
+            android:layout_gravity="center_horizontal"
+            style="@style/bt"
+            android:layout_alignTop="@+id/bt_forgot_pass"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/bt_forgot_pass"
+            android:id="@+id/bt_forgot_pass"
+            android:clickable="true"
+            android:layout_below="@+id/et_email"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="54dp"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_new_account"
+            android:id="@+id/bt_new_account"
+            android:layout_gravity="center_horizontal"
+            style="@style/bt"
+            android:layout_alignTop="@+id/bt_forgot_pass"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    </LinearLayout>
+
+</RelativeLayout>
+<!-- From: file:/Users/Ivan/Documents/projects/Agora/app/src/main/res/layout/activity_login.xml -->

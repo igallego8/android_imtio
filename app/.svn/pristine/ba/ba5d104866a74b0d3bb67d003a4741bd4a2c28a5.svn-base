@@ -1,0 +1,180 @@
+package com.agora.msg;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.db.dao.ChatUserDAO;
+import com.agora.entity.Auth;
+import com.agora.entity.Chat;
+import com.agora.entity.ChatUser;
+import com.agora.entity.Conversation;
+import com.agora.entity.User;
+import com.agora.listener.OnItemTouchListener;
+import com.agora.util.UtilProcess;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Created by Ivan on 13/09/15.
+ */
+public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHolder> {
+
+    private List<Chat> mDataset;
+    private OnItemTouchListener onItemTouchListener;
+    private TextView userName;
+    private TextView qtyMsg;
+    private TextView lastMsg;
+    private SimpleDraweeView image;
+    private Context context;
+    private FrameLayout frameLogo;
+
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public View view;
+        public ViewHolder(View v) {
+            super(v);
+            view = v;
+        }
+    }
+
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public ChatListAdapter(List<Chat> myDataset, OnItemTouchListener listener) {
+        this.mDataset = myDataset;
+        this.onItemTouchListener=listener;
+    }
+
+    // Create new views (invoked by the layout manager)
+    @Override
+    public ChatListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                   int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.cv_chat_item, parent, false);
+        ViewHolder vh = new ViewHolder(v);
+        return vh;
+    }
+
+    public View getView(int position, View convertView, ViewGroup parent) {
+        return null;
+    }
+
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        context=holder.view.getContext();
+        final Chat chat = mDataset.get(position);
+        RelativeLayout layoutChat = (RelativeLayout) holder.view.findViewById(R.id.layout_chat);
+        layoutChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemTouchListener.onCardViewTap(holder.view,chat.getChatKey(),0);
+            }
+        });
+        frameLogo= (FrameLayout)holder.view.findViewById(R.id.frame_logo);
+        image= new  SimpleDraweeView(context);
+        userName= (TextView)holder.view.findViewById(R.id.tv_user_name);
+        qtyMsg= (TextView)holder.view.findViewById(R.id.tv_qty_message);
+        lastMsg= (TextView)holder.view.findViewById(R.id.tv_last_msg);
+        lastMsg.setText(chat.getLastTextMessage());
+        RelativeLayout statusLayout= (RelativeLayout)holder.view.findViewById(R.id.status_layout);
+        qtyMsg.setText("+"+chat.getQtyNewMessages());
+        if(chat.getQtyNewMessages()==0){
+            statusLayout.setVisibility(View.GONE);
+        }
+        Long userKey= chat.getUserKey();
+        new AsyncChatDetailTask().execute(userKey);
+
+    }
+
+
+    // Return the size of your dataset (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        return mDataset.size();
+    }
+
+
+
+    class AsyncChatDetailTask extends AsyncTask<Long, Void, Void> {
+
+        User user;
+        Long userKey;
+        private TextView _userName;
+        private SimpleDraweeView _image;
+        private FrameLayout _frameLogo;
+
+
+        protected void onPreExecute() {
+
+            _userName=userName;
+            _image=image;
+            _frameLogo=frameLogo;
+            //return user;
+        }
+
+        @Override
+        protected Void doInBackground(Long... params) {
+            userKey=params[0];
+            user=AppConfig.dataProvider.findUserByUserKey(userKey);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            String logo= user.getImage();
+            if (logo!=null  && logo.trim().length()!=0) {
+                GenericDraweeHierarchyBuilder builder =
+                        new GenericDraweeHierarchyBuilder(context.getResources());
+                GenericDraweeHierarchy hierarchy = builder
+                        .setFadeDuration(300)
+                        .setRoundingParams(new RoundingParams().setRoundAsCircle(true))
+                        .build();
+                Uri uri = Uri.parse(AppConfig.IMAGES_URL + logo);
+                _image.setImageURI(uri);
+                _image.setHierarchy(hierarchy);
+                _image.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT));
+                _frameLogo.addView(_image);
+            }else{
+                TextView letterName= new TextView(context);
+                letterName.setText("Company".substring(0, 1));
+                letterName.setBackgroundDrawable(UtilProcess.getRoundColorDrawable());
+                letterName.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT));
+                letterName.setTextAppearance(context, R.style.text_5);
+                letterName.setGravity(Gravity.CENTER);
+                _frameLogo.addView(letterName);
+            }
+            _userName.setText(user.getName() + " " +user.getLastName());
+
+
+        }
+    }
+
+
+}

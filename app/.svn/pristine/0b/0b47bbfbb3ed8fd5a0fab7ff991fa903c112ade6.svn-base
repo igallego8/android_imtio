@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/container"
+    android:clickable="true"
+    android:layout_margin="3dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card_view:cardCornerRadius="1dp"
+            card_view:cardUseCompatPadding="true"
+            android:id="@+id/card_view">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout_need"
+                    android:gravity="center"
+                    android:layout_gravity="center">
+
+
+                    <LinearLayout
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/layout_icon"
+                        android:layout_alignParentLeft="true"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:paddingBottom="10dp">
+
+                        <FrameLayout
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:id="@+id/frame_icon"
+                            android:layout_alignParentLeft="true"
+                            android:orientation="horizontal"
+                            android:gravity="center">
+
+                            <com.facebook.drawee.view.SimpleDraweeView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:id="@+id/iv_category_logo"
+                                android:layout_margin="15dp"
+                                android:layout_gravity="center" />
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingLeft="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Description"
+                                android:id="@+id/tv_category_description"
+                                style="@style/text_12"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Nov 23, 12:00pm"
+                                style="@style/text_11"
+                                android:id="@+id/tv_settlement_date"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/ic_keyboard_arrow_down_black_24dp"
+                        android:id="@+id/ib_bid_options"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:alpha="0.6"
+                        android:background="@android:color/transparent" />
+
+                        <com.agora.util.ExpandableTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/text_9"
+                            android:id="@+id/tv_need_description"
+                            android:layout_below="@+id/layout_icon"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            card_view:trimLength="100"
+                            android:alpha="0.7"/>
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/grey400"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:id="@+id/line" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout_icons"
+                    android:gravity="center">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:id="@+id/layout_bid_icons">
+
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_weight="1"
+                            android:id="@+id/layout_deal">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:layout_weight="1"
+                                android:id="@+id/layout_deal_icon">
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/bt_deal_icon"
+                                    android:src="@drawable/ic_gavel_black_24dp"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@android:color/transparent"
+                                    android:alpha="0.6"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/deal_information"
+                                    style="@style/text_10"/>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_weight="1"
+                            android:id="@+id/layout_bid">
+
+                            <FrameLayout
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:id="@+id/frame_bid">
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/bt_bid_icon"
+                                    android:src="@drawable/ic_assignment_ind_black_24dp"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_marginTop="10dp"
+                                    android:background="@android:color/transparent"
+                                    android:alpha="0.6"/>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/count_msg_bubble"
+                                    android:gravity="center"
+                                    android:layout_gravity="right"
+                                    android:padding="4dp"
+                                    android:id="@+id/frame_bid_bubble"
+                                    android:layout_marginLeft="5dp"
+                                    android:visibility="gone">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        style="@style/text_13"
+                                        android:id="@+id/tv_qty_bids"/>
+
+                                </LinearLayout>
+
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/bids_received"
+                                style="@style/text_10"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/grey400"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_weight="1"
+                            android:id="@+id/layout_message">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/messages"
+                                    style="@style/text_10"/>
+
+                                <FrameLayout
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="wrap_content"
+                                        android:id="@+id/frame_message"
+                                        android:layout_toRightOf="@+id/frame_icon_1">
+
+                                        <ImageView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:id="@+id/bt_msg_icon"
+                                            android:src="@drawable/ic_chat_bubble_black_24dp"
+                                            android:layout_marginRight="10dp"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginLeft="10dp"
+                                            android:background="@android:color/transparent"
+                                            android:alpha="0.6"/>
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:background="@drawable/count_msg_bubble"
+                                            android:gravity="center"
+                                            android:layout_gravity="right"
+                                            android:padding="4dp"
+                                            android:id="@+id/frame_message_bubble"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginBottom="5dp"
+                                            android:visibility="gone">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:id="@+id/tv_qty_message"
+                                                style="@style/text_13" />
+
+                                        </LinearLayout>
+
+                                </FrameLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+</LinearLayout>

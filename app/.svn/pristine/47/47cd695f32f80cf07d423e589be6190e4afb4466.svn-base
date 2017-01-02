@@ -1,0 +1,253 @@
+package com.agora.category;
+
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnItemTouchListener;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.entity.Category;
+import com.agora.entity.Need;
+
+import com.agora.need.NeedListAdapter;
+import com.agora.util.NeedType;
+import com.agora.util.SwipeableRecyclerViewTouchListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link CategoryListFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link CategoryListFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class CategoryListFragment extends Fragment implements CategoryListAdapter.OnAdapterInteractionListener {
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private GridLayoutManager manager;
+    private List<Category> mItems= new ArrayList<>();
+    private Activity activity;
+    private OnFragmentInteractionListener mListener;
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment CategoryListFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static CategoryListFragment newInstance(String param1, String param2) {
+        CategoryListFragment fragment = new CategoryListFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public CategoryListFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_category_list, container, false);
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity=activity;
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
+    public void onViewCreated(View view,  Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mRecyclerView = (RecyclerView) getView().findViewById(R.id.categories_recycler_view);
+        manager =new GridLayoutManager(getActivity(),3);
+        mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        com.agora.listener.OnItemTouchListener itemTouchListener = new com.agora.listener.OnItemTouchListener() {
+            @Override
+            public void onCardViewTap(View view, int position,int action) {
+                Toast.makeText(getActivity(), "Tapped " + mItems.get(position), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onButton1Click(View view, int position) {
+                Toast.makeText(getActivity(), "Clicked Button1 in " + mItems.get(position), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onButton2Click(View view, int position) {
+                Toast.makeText(getActivity(), "Clicked Button2 in " + mItems.get(position), Toast.LENGTH_SHORT).show();
+            }
+        };
+        mAdapter = new CategoryListAdapter(mItems,itemTouchListener,this);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setHasFixedSize(true);
+        //mRecyclerView.setLayoutManager(manager);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+    }
+
+    @Override
+    public void onActivityCreated( Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AdpaterAsyncTask task = new AdpaterAsyncTask();
+        task.execute();
+
+
+    }
+
+    @Override
+    public void onDestroyView() {
+
+        if (mRecyclerView != null) {
+            mRecyclerView.setItemAnimator(null);
+            mRecyclerView.setAdapter(null);
+            mRecyclerView = null;
+        }
+        mAdapter = null;
+        manager=null;
+        super.onDestroyView();
+
+    }
+
+    @Override
+    public void setProgressState(int state) {
+        mListener.setProgressState(state);
+    }
+
+
+    private class AdpaterAsyncTask extends AsyncTask<Void, Void,   List<Category> > {
+        @Override
+        protected void onPostExecute( List<Category> result ) {
+            mItems.clear();
+            for (Category n: result){
+                mItems.add(n);
+            }
+            if (mAdapter!=null) {
+                mAdapter.notifyDataSetChanged();
+            }
+            Message msg = handler.obtainMessage();
+            msg.arg1 = AppConfig.PROGRESS_STOP;
+            handler.sendMessage(msg);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Message msg = handler.obtainMessage();
+            msg.arg1 = AppConfig.PROGRESS_RUNNING;
+            handler.sendMessage(msg);
+
+        }
+
+        @Override
+        protected  List<Category>  doInBackground(Void... params) {
+            // everything in here gets executed in a separate thread
+            final NeedType type = ((CategoryListActivity) activity).getNeedType();
+            List<Category> list = new ArrayList<>();
+            if (type != null) {
+                switch (type) {
+                    case PRODUCT:
+                        list = AppConfig.dataProvider.fetchProductCategories();
+                        break;
+                    case SERVICE:
+                        break;
+
+                }
+
+            }
+            return list;
+        }
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        public void onFragmentInteraction(Uri uri);
+
+        public void setProgressState(int state);
+    }
+
+
+    // Define the Handler that receives messages from the thread and update the progress
+    final Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            int current = msg.arg1;
+            if(mListener!=null) {
+                if (current == AppConfig.PROGRESS_STOP) {
+                    mListener.setProgressState(AppConfig.PROGRESS_STOP);
+                } else {
+                    mListener.setProgressState(AppConfig.PROGRESS_RUNNING);
+                }
+            }
+        }
+    };
+
+}

@@ -1,0 +1,274 @@
+package com.agora.entity;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by Ivan on 14/09/15.
+ */
+public class Need implements Serializable {
+
+    private Long needKey;
+    private String description;
+    private Date settlementDate;
+    private Date expirationDate;
+    private int expirationDateWeight;
+    private int shipToClientDestinationWeight;
+    private int deliveryOnSaleSiteWeight;
+    private int bestOfferWeight;
+    private int creditCardPaymentWeight;
+    private int cashPaymentWeight;
+    private BigDecimal maxAmount;
+    private int maxAmountWeight;
+
+    private ArrayList<Bid> bids=new ArrayList<>();
+    private Integer messagesNumber=0;
+    private Integer bidsNumber=0;
+    private Long userKey;
+    private String type;
+
+    private String image1;
+    private String image2;
+    private String image3;
+    private Category category;
+
+    public Long getUserKey() {
+        return userKey;
+    }
+
+    public void setUserKey(Long userKey) {
+        this.userKey = userKey;
+    }
+
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+
+
+    public Need (){
+
+    }
+
+    public Date getSettlementDate() {
+        return settlementDate;
+    }
+
+    public void setSettlementDate(Date settlementDate) {
+        this.settlementDate = settlementDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public Long getNeedKey() {
+        return needKey;
+    }
+
+    public void setNeedKey(Long needKey) {
+        this.needKey = needKey;
+    }
+
+    public ArrayList<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(ArrayList<Bid> bids) {
+        this.bids = bids;
+    }
+
+    public Integer getMessagesNumber() {
+        return messagesNumber;
+    }
+
+    public void setMessagesNumber(Integer messagesNumber) {
+        this.messagesNumber = messagesNumber;
+    }
+
+    public Integer getBidsNumber() {
+        return bidsNumber;
+    }
+
+    public void setBidsNumber(Integer bidsNumber) {
+        this.bidsNumber = bidsNumber;
+    }
+
+
+
+    public int getExpirationDateWeight() {
+        return expirationDateWeight;
+    }
+
+    public void setExpirationDateWeight(int expirationDateWeight) {
+        this.expirationDateWeight = expirationDateWeight;
+    }
+
+
+    public int getShipToClientDestinationWeight() {
+        return shipToClientDestinationWeight;
+    }
+
+    public void setShipToClientDestinationWeight(int shipToClientDestinationWeight) {
+        this.shipToClientDestinationWeight = shipToClientDestinationWeight;
+    }
+
+
+    public int getDeliveryOnSaleSiteWeight() {
+        return deliveryOnSaleSiteWeight;
+    }
+
+    public void setDeliveryOnSaleSiteWeight(int deliveryOnSaleSiteWeight) {
+        this.deliveryOnSaleSiteWeight = deliveryOnSaleSiteWeight;
+    }
+
+
+    public int getBestOfferWeight() {
+        return bestOfferWeight;
+    }
+
+    public void setBestOfferWeight(int bestOfferWeight) {
+        this.bestOfferWeight = bestOfferWeight;
+    }
+
+    public int getCreditCardPaymentWeight() {
+        return creditCardPaymentWeight;
+    }
+
+    public void setCreditCardPaymentWeight(int creditCardPaymentWeight) {
+        this.creditCardPaymentWeight = creditCardPaymentWeight;
+    }
+
+    public int getCashPaymentWeight() {
+        return cashPaymentWeight;
+    }
+
+    public void setCashPaymentWeight(int cashPaymentWeight) {
+        this.cashPaymentWeight = cashPaymentWeight;
+    }
+
+    public BigDecimal getMaxAmount() {
+        return maxAmount;
+    }
+
+    public void setMaxAmount(BigDecimal maxAmount) {
+        this.maxAmount = maxAmount;
+    }
+
+    public int getMaxAmountWeight() {
+        return maxAmountWeight;
+    }
+
+    public void setMaxAmountWeight(int maxAmountWeight) {
+        this.maxAmountWeight = maxAmountWeight;
+    }
+
+
+    public String toString(){
+        StringBuffer buffer=new StringBuffer();
+        buffer.append("need:{");
+        if (needKey!=null) {
+            buffer.append("needKey:").append(needKey).append(",");
+        }
+        buffer.append("description:").append(description).append(",");
+        if (expirationDate!=null) {
+            buffer.append("expirationDate:").append(expirationDate.getTime()).append(",");
+        }
+        if (settlementDate!=null) {
+            buffer.append("settlementDate:").append(settlementDate.getTime()).append(",");
+        }
+        if(messagesNumber!=null) {
+            buffer.append("messagesNumber:").append(messagesNumber).append(",");
+        }
+        if (bidsNumber!=null) {
+            buffer.append("bidsNumber:").append(bidsNumber).append(",");
+        }
+        if (category!=null) {
+            buffer.append(category.toString()).append(",");
+        }
+
+        buffer.append("expirationDateWeight:").append(expirationDateWeight).append(",");
+        buffer.append("shipToClientDestinationWeight:").append(shipToClientDestinationWeight).append(",");
+        buffer.append("deliveryOnSaleSiteWeight:").append(deliveryOnSaleSiteWeight).append(",");
+        buffer.append("bestOfferWeight:").append(bestOfferWeight).append(",");
+        buffer.append("creditCardPaymentWeight:").append(creditCardPaymentWeight).append(",");
+        buffer.append("cashPaymentWeight:").append(cashPaymentWeight).append(",");
+        buffer.append("maxAmountWeight:").append(maxAmountWeight).append(",");
+        
+        if(maxAmount!=null) {
+            buffer.append("maxAmount:").append(maxAmount.doubleValue()).append(",");
+        }
+
+        if(image1!=null) {
+            buffer.append("image1:").append(image1).append(",");
+        }
+
+        if(image2!=null) {
+            buffer.append("image2:").append(image2).append(",");
+        }
+        if(image3!=null) {
+            buffer.append("image3:").append(image3).append(",");
+        }
+
+        if (type!=null){
+            buffer.append("type:").append(type);
+        }
+
+        buffer.append("}");
+        return buffer.toString();
+    }
+
+    public String getImage1() {
+        return image1;
+    }
+
+    public void setImage1(String image1) {
+        this.image1 = image1;
+    }
+
+    public String getImage2() {
+        return image2;
+    }
+
+    public void setImage2(String image2) {
+        this.image2 = image2;
+    }
+
+    public String getImage3() {
+        return image3;
+    }
+
+    public void setImage3(String image3) {
+        this.image3 = image3;
+    }
+}

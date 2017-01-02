@@ -1,0 +1,78 @@
+package com.agora.builder;
+
+import com.agora.entity.Category;
+import com.agora.entity.Need;
+import com.agora.entity.Topic;
+import com.agora.util.UtilProcess;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * Created by Ivan on 18/09/15.
+ */
+public class NeedBuilder implements Builder {
+    @Override
+    public Object build(JSONObject o) throws JSONException {
+            Long key=Long.valueOf(o.getString("needKey"));
+            String description= o.getString("description");
+            String d= o.optString("expirationDate");
+            Date expirationDate=null;
+            if (d!=null && !d.trim().equals("")) {
+                    expirationDate = UtilProcess.getDate(d);
+            }
+            Date settlementDate= new Date(System.currentTimeMillis());// UtilProcess.getDate(o.optString("settlementDate"));
+            int expirationDateWeight= o.optInt("expirationDateWeight");
+            boolean shipToClientDestination=o.optBoolean("shipToClientDestination");
+            int shipToClientDestinationWeight=o.optInt("shipToClientDestinationWeight");
+            boolean deliveryOnSaleSite=o.optBoolean("deliveryOnSaleSite");
+            int deliveryOnSaleSiteWeight=o.optInt("deliveryOnSaleSiteWeight");
+            boolean bestOffer=o.optBoolean("bestOffer");
+            int bestOfferWeight=o.optInt("bestOfferWeight");
+            boolean creditCardPayment=o.optBoolean("creditCardPayment");
+            int creditCardPaymentWeight=o.optInt("creditCardPaymentWeight");
+            boolean cashPayment=o.optBoolean("cashPayment");
+            int cashPaymentWeight=o.optInt("cashPaymentWeight");
+            String amount= o.optString("maxAmount");
+            String image1= o.optString("image1");
+            String image2= o.optString("image2");
+            String image3= o.optString("image3");
+
+            BigDecimal maxAmount=null;
+            if (amount!=null && !amount.trim().equals("")){
+                    maxAmount = new BigDecimal (amount);
+            }
+            int maxAmountWeight = o.optInt("maxAmountWeight");
+            int msgNumber=o.getInt("messagesNumber");
+            int bidsNumber=o.getInt("bidsNumber");
+            String type=o.getString("type");
+            JSONObject jsonCategory= o.getJSONObject("category");
+            Category category = (Category) BuilderFactory.getBuilder(CategoryBuilder.class.getName()).build(jsonCategory);
+            Need need= new Need();
+            need.setNeedKey(key);
+            need.setUserKey(1L);
+            need.setCategory(category);
+            need.setDescription(description);
+            need.setSettlementDate(settlementDate);
+            need.setMaxAmount(maxAmount);
+            need.setExpirationDate(expirationDate);
+            need.setExpirationDateWeight(expirationDateWeight);
+            need.setCreditCardPaymentWeight(creditCardPaymentWeight);
+            need.setCashPaymentWeight(cashPaymentWeight);
+            need.setDeliveryOnSaleSiteWeight(deliveryOnSaleSiteWeight);
+            need.setShipToClientDestinationWeight(shipToClientDestinationWeight);
+            need.setMaxAmountWeight(maxAmountWeight);
+            need.setMessagesNumber(msgNumber);
+            need.setBidsNumber(bidsNumber);
+            need.setType(type);
+            need.setBestOfferWeight(bestOfferWeight);
+            need.setImage1(image1);
+            need.setImage2(image2);
+            need.setImage3(image3);
+            return need;
+
+    }
+}

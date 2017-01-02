@@ -1,0 +1,194 @@
+package com.agora.demo;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.need.NeedListActivity;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * An example full-screen activity that shows and hides the system UI (i.e.
+ * status bar and navigation/system bar) with user interaction.
+ */
+public class DemoActivity extends Activity implements ViewPager.OnPageChangeListener {
+
+    private LinearLayout dotContainer;
+    private LinearLayout buttonsContainer;
+    private Button btSignIn;
+    private Button btSignUp;
+    private int index;
+    private RelativeLayout container;
+    public  int empty_dot_size;
+    public  int filled_dot_size;
+    public  int margin;
+    private CustomPagerAdapter pagerAdapter;
+    private ViewPager pager;
+    private List<ImageView> dotList= new ArrayList<>();
+    private int dpHeight;
+    private int dpWidth;
+    private List<DemoDTO> data= new ArrayList<>();
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_demo_pager);
+        if (savedInstanceState==null ) {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+            String skipMessage = settings.getString(AppConfig.PREF_KEY_SKIP_NEED_TUTORIAL, "NOT checked");
+            if (!skipMessage.equals("checked")) {
+
+                DemoDTO d= new DemoDTO();
+                d.setImage(R.drawable.logo_2);
+                d.setText(this.getString(R.string.welcome));
+                data.add(d);
+                d= new DemoDTO();
+                d.setImage(R.drawable.demo_need_new);
+                d.setText("Registra tus necesidades usando el boton (+) y recibirás pronto ofertas de proveedores.");
+                data.add(d);
+                d= new DemoDTO();
+                d.setImage(R.drawable.demo_need_category);
+                d.setText("Encontrarás gran varidad de categorías de productos y servicios");
+                data.add(d);
+                d= new DemoDTO();
+                d.setImage(R.drawable.demo_need_description);
+                d.setText("Ayúdanos a saber con claridad tu necesidad ;) \n.Entre más  detallado es tu descripción, más acertadas serán las ofertas que recibirás.");
+                data.add(d);
+                d= new DemoDTO();
+                d.setImage(R.drawable.demo_need_attach);
+                d.setText("Anexa las imágenes si necesitas mostrar con imagenes lo que necesitas.");
+                data.add(d);
+                d= new DemoDTO();
+                d.setImage(R.drawable.demo_need_pref);
+                d.setText("Informanos de cuales son tus prioridades en terminos de  tipo de pago, tiempo de entrega, servicio de entrega. Haremos saber a los proveedores de estas preferencias para que cumplan con en totalidad con tus necesidades.");
+                data.add(d);
+                d= new DemoDTO();
+                d.setImage(R.drawable.demo_bid_info);
+                d.setText("Selecciona la oferta que cumpla con tus necesidades.");
+                data.add(d);
+
+                pager = (ViewPager)findViewById(R.id.view_pager);
+                pagerAdapter= new CustomPagerAdapter(this, data);
+                pager.setAdapter(pagerAdapter);
+                container=(RelativeLayout)findViewById(R.id.container);
+                pager.addOnPageChangeListener(this);
+                DisplayMetrics screenDensity = this.getResources().getDisplayMetrics();
+                dpHeight = (int) (screenDensity.heightPixels / screenDensity.density);
+                dpWidth = (int) (screenDensity.widthPixels / screenDensity.density);
+                dotContainer = (LinearLayout) findViewById(R.id.dot_container);
+                buttonsContainer = (LinearLayout) findViewById(R.id.button_container);
+                btSignIn = (Button) findViewById(R.id.bt_sign_in);
+                btSignIn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(DemoActivity.this.getApplicationContext());
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(AppConfig.PREF_KEY_SKIP_NEED_TUTORIAL, "checked");
+                        editor.commit();
+                        needListIntent();
+
+                    }
+                });
+                btSignUp = (Button) findViewById(R.id.bt_sign_up);
+                btSignUp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(DemoActivity.this.getApplicationContext());
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(AppConfig.PREF_KEY_SKIP_NEED_TUTORIAL, "checked");
+                        editor.commit();
+                        needListIntent();
+
+                    }
+                });
+
+                filled_dot_size = (int) getResources().getDimension(R.dimen.filled_dot_size);
+                empty_dot_size = (int) getResources().getDimension(R.dimen.empty_dot_size);
+                margin = (int) getResources().getDimension(R.dimen.margin_dot_size);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(margin, 0, margin, 0);
+                for (int x=0;x<data.size();x++){
+                    ImageView dot = new ImageView(this);
+                    dot.setLayoutParams(lp);
+                    dotList.add(dot);
+                    dotContainer.addView(dot);
+                }
+                updateDots();
+            }else{
+                needListIntent();
+            }
+        }
+
+    }
+
+
+    public void needListIntent(){
+        Intent mainIntent = new Intent(this, NeedListActivity.class);
+        this.startActivity(mainIntent);
+        this.finish();
+    }
+
+    public void updateDots(){
+        dotList.get(index).setBackground(getResources().getDrawable(R.drawable.solid_dot));
+        dotList.get(index).setMinimumHeight(filled_dot_size);
+        dotList.get(index).setMinimumWidth(filled_dot_size);
+        dotList.get(index).setAlpha(1f);
+        for (int x=0;x<dotList.size();x++) {
+            if(x!=index){
+                dotList.get(x).setMinimumHeight(empty_dot_size);
+                dotList.get(x).setMinimumWidth(empty_dot_size);
+                dotList.get(x).setBackground(getResources().getDrawable(R.drawable.empty_dot));
+                dotList.get(x).setAlpha(0.30f);
+
+            }
+        }
+
+        if (index==dotList.size()-1){
+            buttonsContainer.setVisibility(View.VISIBLE);
+            Animation animation= AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_fade_in);
+            buttonsContainer.startAnimation(animation);
+        }else if (View.VISIBLE==buttonsContainer.getVisibility()){
+            buttonsContainer.setVisibility(View.GONE);
+            Animation animation= AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_fade_out);
+            buttonsContainer.startAnimation(animation);
+        }
+
+
+    }
+
+
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        index=position;
+        updateDots();
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+}

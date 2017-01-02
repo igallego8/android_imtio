@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/pref_cat_notification_title" >
+        <SwitchPreference
+            android:id="@+id/pref_notification_sound_new_bi"
+            android:key="pref_notification_sound_new_bid"
+            android:defaultValue="true"
+            android:summary="@string/pref_notification_sound_summary"
+            android:title="@string/pref_notification_sound_title"
+            />
+
+        <SwitchPreference
+            android:id="@+id/pref_notification_vib_new_bid"
+            android:defaultValue="true"
+            android:key="pref_notification_vib_new_bid"
+            android:summary="@string/pref_notification_vib_summary"
+            android:title="@string/pref_notification_vib_title" />
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

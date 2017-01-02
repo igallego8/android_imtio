@@ -1,0 +1,202 @@
+package com.agora.msg;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.db.dao.ChatDAO;
+import com.agora.db.dao.ChatUserDAO;
+import com.agora.entity.Chat;
+import com.agora.entity.Conversation;
+import com.agora.listener.OnItemTouchListener;
+import com.agora.need.NeedListAdapter;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link ChatListFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link ChatListFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class ChatListFragment extends Fragment  implements OnItemTouchListener {
+
+    private OnFragmentInteractionListener mListener;
+    private ArrayList<Chat> chats;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager manager;
+    private RecyclerView mRecyclerView;
+    private ProgressDialog progress;
+    public static final String INTENT_FILTER_CHAT_CHANGED="com.agora.msg.CHAT_CHANGED";
+    public static final String CHAT_KEY="chatKey";
+    public static final String MESSAGE="message";
+    public static final String TAG="ChatListFragment";
+
+    private BroadcastReceiver chatUpdateReceiver =  new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateChat();
+        }
+    };
+
+
+    protected void updateChat(){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for (int index = 0; index < chats.size(); index++) {
+                    Chat aux = ChatDAO.getInstance().fetchChatByChatKey(chats.get(index).getChatKey());
+                    if (aux != null) ;
+                    chats.set(index, aux);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+    }
+
+    public static ChatListFragment newInstance(ArrayList<Chat> chats) {
+        ChatListFragment fragment = new ChatListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("chats",chats);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public ChatListFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+    }
+
+    @Override
+    public void onViewCreated(View view,  Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        chats=(ArrayList<Chat>)getArguments().get("chats");
+        mRecyclerView = (RecyclerView) getView().findViewById(R.id.chats_recycler_view);
+        manager =new LinearLayoutManager(getActivity());
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mAdapter = new ChatListAdapter(chats,this);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(manager);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_chat_list, container, false);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
+    public void onCardViewTap(View view, int position, int action) {
+        new MessagesAsyncTask().execute(position);
+    }
+
+    @Override
+    public void onButton1Click(View view, int position) {
+
+    }
+
+    @Override
+    public void onButton2Click(View view, int position) {
+
+    }
+
+
+    public interface OnFragmentInteractionListener {
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        IntentFilter filterAdd = new IntentFilter();
+        filterAdd.addAction(INTENT_FILTER_CHAT_CHANGED);
+        getActivity().registerReceiver(chatUpdateReceiver, filterAdd);
+        updateChat();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(chatUpdateReceiver);
+    }
+
+
+    private class MessagesAsyncTask extends AsyncTask<Integer, Void, Chat> {
+
+        @Override
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(getActivity(), null,
+                    getResources().getString(R.string.please_wait), true);
+            progress.show();
+        }
+
+        @Override
+        protected Chat doInBackground(Integer... params) {
+            ChatDAO dao= ChatDAO.getInstance();
+            Chat chat= dao.fetchChatByChatKey(params[0]);
+            if (chat!=null) {
+                chat.setQtyNewMessages(0);
+                dao.update(chat);
+            }
+            AppConfig.dataProvider.messagesRead(chat.getNeedKey(), chat.getQtyNewMessages());
+            return chat;
+        }
+
+
+        @Override
+        protected void onPostExecute( Chat chat) {
+            Intent intent = new Intent(getActivity(), MessageActivity.class);
+            intent.putExtra("chat",chat) ;
+            getActivity().startActivity(intent);
+            progress.dismiss();
+        }
+
+    }
+
+}

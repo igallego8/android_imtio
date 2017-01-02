@@ -1,0 +1,210 @@
+package com.agora.mockup;
+
+import com.agora.entity.Bid;
+import com.agora.entity.BidDetail;
+import com.agora.entity.Company;
+import com.agora.entity.Conversation;
+import com.agora.entity.Message;
+import com.agora.entity.Need;
+import com.agora.entity.NeedDetail;
+import com.agora.entity.ProductBid;
+import com.agora.entity.ServiceBid;
+import com.agora.entity.Topic;
+import com.agora.msg.OneComment;
+import com.agora.util.NeedType;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * Created by Ivan on 13/09/15.
+ */
+public class DTOBuilder {
+
+    private static Random random=new Random();
+
+    private static List<Topic> topics = new ArrayList<>();
+    private static List<Need> needList = new ArrayList<Need>();
+
+    static{
+        topics.add(new Topic(1L, "Radio"));
+        topics.add(new Topic(1L, "Cellphone"));
+        topics.add(new Topic(1L, "TV"));
+        topics.add(new Topic(1L, "Camera"));
+        topics.add(new Topic(1L, "MP3"));
+    }
+
+
+    public static List<Topic> getTopicArray(){
+        return topics;
+    }
+
+
+    public static  List<Bid> getBidArray (Need need){
+        List<Bid> list = new ArrayList<>();
+        for (int x=0;x<5;x++)
+        {
+            Date date= new Date(System.currentTimeMillis());
+            Bid b =  new Bid((long)x,need,null,null,date);
+            b.setCreationDate(date);
+            b.setExpirationDate(new Date(System.currentTimeMillis() + 60 * 60 * 24 * 1000));
+            list.add(b);
+        }
+        return list;
+    }
+
+
+    public static  List<Conversation> getConversationNeedKeyArray (Long needKey){
+        List<Conversation> list = new ArrayList<>();
+        Company company= new Company();
+        company.setCompanyName("Katronix");
+        company.setCompanyKey(1L);
+
+        for (int x=0;x<5;x++)
+        {
+
+            Conversation c =  new Conversation();
+            c.setCompany(company);
+            c.setTotalNewMassages(5);
+            c.setText("This is a message from our company as response of your need. We have ......");
+            list.add(c);
+        }
+        return list;
+    }
+
+    public static  List<Conversation> getConversationUserKeyArray (Long userKey){
+        List<Conversation> list = new ArrayList<>();
+        Company company= new Company();
+        company.setCompanyName("Katronix");
+        company.setCompanyKey(1L);
+        for (int x=0;x<5;x++)
+        {
+            Conversation c =  new Conversation();
+            c.setCompany(company);
+            c.setTotalNewMassages(5);
+            c.setText("This is a message from our company as response of your need. We have ......");
+            list.add(c);
+        }
+        return list;
+    }
+
+
+    public static  List<Conversation> getConversationCompanyKeyArray (Long companyKey){
+        List<Conversation> list = new ArrayList<>();
+        Need need= new Need(1L,"Necesito Camara",NeedType.PRODUCT.getType(),null);
+
+        for (int x=0;x<5;x++)
+        {
+            Conversation c =  new Conversation();
+            c.setNeed(need);
+            c.setTotalNewMassages(5);
+            c.setText("This is a message from our company as response of your need. We have ......");
+            list.add(c);
+        }
+        return list;
+    }
+
+    public static void getBidDetail (Bid bid){
+        BidDetail detail= new BidDetail();
+        detail.setObservation("Bid Details observations");
+        detail.setImage1("image1");
+        detail.setImage2("image2");
+        detail.setImage3("image3");
+        bid.setDetail(detail);
+    }
+
+    public static final String[] needs_names= new String[]{"Reloj","Cartera","Patines","Camera","Servicio Lavadora"};
+
+    public static List<Need> getNeedArray (){
+        needList.clear();
+        for (int x=0;x<5;x++)
+        {
+            Need n =  new Need((long)x,null,null,3,4,"", NeedType.PRODUCT.getType(),null);
+            n.setDescription(needs_names[x]);
+            n.setSettlementDate(new Date(System.currentTimeMillis()));
+            n.setExpirationDate(new Date(System.currentTimeMillis() + 60 * 60 * 24 * 1000));
+
+            needList.add(n);
+        }
+        return needList;
+    }
+
+
+    public static boolean createNeed (Need need){
+        needList.add(need);
+        return true;
+    }
+
+    public static boolean removeNeed (Long needKey){
+        for (Need n: needList ){
+           if( n.getNeedKey()==needKey) {
+               needList.remove(n);
+               return true;
+           }
+
+        }
+
+        return false;
+    }
+
+
+    public static final String[] company_names= new String[]{"Falabella","Tecno","Celulares NET","SexShop","Duarte LTDA"};
+
+    public static List<Message> getMessageArray (){
+        List<Message> list = new ArrayList<Message>();
+        for (int x=0;x<5;x++)
+        {
+            Message b =  new Message();
+           // b.setCompanyName(company_names[x]);
+           // b.setText("Message text Message text Message text Message text Message text " + x);
+            list.add(b);
+        }
+        return list;
+    }
+
+
+    public static void  getNeedDetail(Need need){
+        NeedDetail d= new NeedDetail();
+        d.setObservation("Need Details observations");
+        d.setImage1("image1");
+        d.setImage2("image2");
+        d.setImage3("image3");
+        need.setDetial(d);
+
+    }
+
+
+    public static List<OneComment> getOneCommentArray() {
+        List<OneComment> l= new ArrayList<OneComment>();
+        l.add(new OneComment(true, "Hello bubbles!"));
+
+        for (int i = 0; i < 4; i++) {
+            boolean left = i%2==0? true : false;
+
+            String words = "Hola pruebas "+ i;
+
+            l.add(new OneComment(left, words));
+        }
+        return l;
+    }
+
+    public static int getRandomInteger(int aStart, int aEnd) {
+        if (aStart > aEnd) {
+            throw new IllegalArgumentException("Start cannot exceed End.");
+        }
+        long range = (long) aEnd - (long) aStart + 1;
+        long fraction = (long) (range * random.nextDouble());
+        int randomNumber = (int) (fraction + aStart);
+        return randomNumber;
+    }
+
+
+    public static Topic getTopic(){
+        return topics.get(getRandomInteger(0,4));
+
+    }
+
+
+}

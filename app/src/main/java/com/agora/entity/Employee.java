@@ -1,0 +1,10 @@
+package com.agora.entity;
+
+/**
+ * Created by Ivan on 17/09/15.
+ */
+public class Employee extends User {
+
+
+
+}

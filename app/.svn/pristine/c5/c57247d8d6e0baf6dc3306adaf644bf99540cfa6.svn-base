@@ -1,0 +1,90 @@
+package com.agora.demo;
+
+import android.content.Context;
+import android.content.res.Resources;
+import android.support.v4.view.PagerAdapter;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.agora.R;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
+
+import java.util.List;
+
+/**
+ * Created by Ivan on 24/01/16.
+ */
+public class CustomPagerAdapter extends PagerAdapter {
+
+    private Context context;
+    private LayoutInflater layoutInflater;
+    private List<DemoDTO> data;
+    private View view;
+
+
+    public CustomPagerAdapter(Context context, List<DemoDTO> data){
+        this.context=context;
+        this.data=data;
+    }
+    @Override
+    public int getCount() {
+        if (data!=null){
+            return data.size();
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean isViewFromObject(View view, Object object) {
+        return view==(LinearLayout)object;
+    }
+
+
+    @Override
+    public Object instantiateItem(ViewGroup container , int position){
+        DemoDTO d=data.get(position);
+        layoutInflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view=layoutInflater.inflate(R.layout.swipe_demo_pager,container,false);
+        ImageView imageView= (ImageView) view.findViewById(R.id.imageView1) ;
+        TextView textView= (TextView) view.findViewById(R.id.tv_text1) ;
+        textView.setText(d.getText());
+        if (position==0){
+            imageView.setVisibility(View.GONE);
+            SimpleDraweeView draweeView = (SimpleDraweeView) view.findViewById(R.id.drawee_image_view);
+            ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithResourceId(R.raw.logo_small_gif).build();
+
+            //Controller is required for controller the GIF animation, here I have just set it to autoplay as per the fresco guide.
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setUri(imageRequest.getSourceUri())
+                    .setAutoPlayAnimations(true)
+                    .build();
+            //Set the DraweeView controller, and you should be good to go.
+            draweeView.setController(controller);
+            textView.setTextSize(context.getResources().getDimension(
+                    R.dimen.drawer_text_item_size_20));
+
+            // Ion.with(imageView).load("file:///android_asset/htmls/logo_gif.gif");
+        }else{
+           // imageView.setVisibility(View.VISIBLE);
+            imageView.setImageResource(d.getImage());
+       }
+
+        container.addView(view);
+        return view;
+
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object){
+        container.removeView((LinearLayout) object);
+    }
+
+}

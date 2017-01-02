@@ -1,0 +1,70 @@
+package com.agora.need;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.ImageButton;
+
+import com.agora.R;
+import com.agora.category.CategoryListActivity;
+import com.agora.util.NeedType;
+
+/**
+ * Created by Ivan on 23/11/15.
+ */
+public class NeedTypeDialog extends Dialog implements
+        android.view.View.OnClickListener{
+
+
+
+    public NeedTypeDialog(Context context) {
+        super(context);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.fragment_need_create_type);
+        ImageButton btNewProductNeed= (ImageButton) findViewById(R.id.ib_new_need_product);
+        btNewProductNeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), CategoryListActivity.class);
+                intent.putExtra(CategoryListActivity.TYPE, NeedType.PRODUCT);
+                getContext().startActivity(intent);
+                NeedTypeDialog.this.dismiss();
+            }
+        });
+
+        ImageButton btNewServiceNeed= (ImageButton) findViewById(R.id.ib_new_need_service);
+        btNewServiceNeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(),CategoryListActivity.class);
+                intent.putExtra(CategoryListActivity.TYPE, NeedType.SERVICE);
+                getContext().startActivity(intent);
+                NeedTypeDialog.this.dismiss();
+            }
+        });
+
+
+        Button cancel= (Button) findViewById(R.id.bt_cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NeedTypeDialog.this.dismiss();
+            }
+        });
+
+    }
+
+    @Override
+    public void onClick(View v) {
+
+    }
+}

@@ -1,0 +1,58 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.agora.image.ImageDialogFragment"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_border"
+    android:gravity="center" >
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:id="@+id/iv_image"
+        fresco:roundTopLeft="false"
+        fresco:roundTopRight="false"
+        fresco:roundBottomLeft="false"
+        fresco:roundBottomRight="false"
+        fresco:roundAsCircle="false" />
+
+    <FrameLayout
+        android:id="@+id/frame_left"
+        android:layout_width="50dp"
+        android:layout_height="300dp"
+        android:background="@color/black"
+        android:alpha="0.3"
+        android:layout_alignParentLeft="true">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_keyboard_arrow_left_white_48dp"
+                android:layout_gravity="center"
+                android:id="@+id/ib_left"
+                android:background="@android:color/transparent" />
+
+        </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frame_right"
+        android:layout_width="50dp"
+        android:layout_height="300dp"
+        android:background="@color/black"
+        android:alpha="0.3"
+        android:layout_alignParentRight="true">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_keyboard_arrow_right_white_48dp"
+                android:layout_gravity="center"
+                android:id="@+id/ib_right"
+                android:background="@android:color/transparent" />
+
+        </FrameLayout>
+
+</RelativeLayout>
+

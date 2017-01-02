@@ -1,0 +1,144 @@
+package com.agora.json;
+
+
+import com.agora.app.AppConfig;
+
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.zip.GZIPInputStream;
+
+
+public class HTTPJSONRequest {
+
+    public static JSONObject requestHttpPost(String urlString, JSONObject jsonObjSend) {
+        HttpURLConnection conn=null;
+        InputStream instream=null;
+        try {
+            URL url = new URL(urlString);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setConnectTimeout(AppConfig.TIMEOUT_HTTP_CONNECTION);
+            conn.setRequestProperty("userkey", "1");
+            OutputStream os = conn.getOutputStream();
+            String input=jsonObjSend.toString();
+            os.write(input.getBytes());
+            os.flush();
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            }
+
+            instream = conn.getInputStream();
+            String resultString= convertStreamToString(instream);
+            conn.disconnect();
+            instream.close();
+            resultString = resultString.substring(1,resultString.length()-1);
+            JSONObject jsonResponse = new JSONObject(resultString);
+            return jsonResponse;
+        }
+        catch (Exception e)
+        {
+            // More about HTTP exception handling in another tutorial.
+            // For now we just print the stack trace.
+            e.printStackTrace();
+        }finally{
+            try{
+                if(conn!=null) {
+                    conn.disconnect();
+                }
+
+                if(instream!=null) {
+                    instream.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace(); //If you want further info on failure...
+            }
+        }
+        return null;
+    }
+
+
+    public static JSONObject requestHttpGet(String urlString) {
+        HttpURLConnection conn=null;
+        InputStream instream=null;
+        try {
+            URL url = new URL(urlString);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setConnectTimeout(AppConfig.TIMEOUT_HTTP_CONNECTION);
+          /*  if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            }*/
+
+            instream = conn.getInputStream();
+            String resultString= convertStreamToString(instream);
+            conn.disconnect();
+            instream.close();
+            resultString = resultString.substring(1,resultString.length()-1);
+            JSONObject jsonResponse = new JSONObject(resultString);
+            return jsonResponse;
+        }
+        catch (Exception e)
+        {
+            // More about HTTP exception handling in another tutorial.
+            // For now we just print the stack trace.
+            e.printStackTrace();
+        }finally{
+            try{
+                if(conn!=null) {
+                    conn.disconnect();
+                }
+
+                if(instream!=null) {
+                    instream.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace(); //If you want further info on failure...
+            }
+        }
+        return null;
+    }
+
+
+    private static String convertStreamToString(InputStream is) {
+		/*
+		 * To convert the InputStream to String we use the BufferedReader.readLine()
+		 * method. We iterate until the BufferedReader return null which means
+		 * there's no more data to read. Each line will appended to a StringBuilder
+		 * and returned as String.
+		 *
+		 * (c) public domain: http://senior.ceng.metu.edu.tr/2009/praeda/2009/01/11/a-simple-restful-client-at-android/
+		 */
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
+
+}

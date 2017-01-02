@@ -1,0 +1,136 @@
+package com.agora.msg;
+
+import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import com.agora.R;
+import com.agora.app.ActivityToolBarProgress;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.db.dao.ChatDAO;
+import com.agora.db.dao.ChatUserDAO;
+import com.agora.db.dao.MessageDAO;
+import com.agora.entity.Chat;
+import com.agora.entity.ChatUser;
+import com.agora.entity.Message;
+import com.agora.entity.Msg;
+import com.agora.entity.Target;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class MessageActivity extends ActivityToolBarProgress implements MessageFragment.OnFragmentInteractionListener {
+
+    private MessageFragment fragment;
+    private Chat chat;
+    private ProgressDialog progress;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_message);
+        super.onCreate();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        chat= (Chat)getIntent().getSerializableExtra("chat");
+        ArrayList<Message> messages= MessageDAO.getInstance().fetchMessagesByChatKey(chat.getChatKey());
+        if (savedInstanceState == null) {
+            fragment = MessageFragment.newInstance(messages);
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.add(R.id.fragment4, fragment, "fragment4");
+            transaction.commit();
+        }else{
+            fragment = (MessageFragment) getFragmentManager().findFragmentByTag("fragment4");
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_message, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void sendMessage(String text, Boolean isIncoming) {
+        new AsyncSendMsgTask().execute(text,isIncoming);
+    }
+
+
+
+    private class AsyncSendMsgTask extends AsyncTask<Object,Void,Void>{
+
+        private MediaPlayer mMediaPlayer;
+        com.agora.entity.Message message;
+
+        @Override
+        public  void onPreExecute(){
+            mMediaPlayer = MediaPlayer.create(MessageActivity.this, R.raw.sounds_msg_sent);
+            mMediaPlayer.setLooping(false);
+            //AudioManager am = (AudioManager) getSystemService(MessageActivity.this.AUDIO_SERVICE);
+            //am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+            progress = ProgressDialog.show(MessageActivity.this, null,
+                    getResources().getString(R.string.please_wait), true);
+            progress.show();
+
+        }
+
+
+        @Override
+        protected Void doInBackground(Object... params) {
+            String text=(String)params[0];
+            Boolean isIncoming=(Boolean)params[1];
+            message= new com.agora.entity.Message();
+            message.setIncoming(isIncoming);
+            message.setChatKey(chat.getChatKey());
+            message.setStatus(AppConfig.MSG_CREATED);
+            message.setText(text);
+            message.setCreationDate(new Date(System.currentTimeMillis()));
+            chat.setLastTextMessage(text);
+            Msg msg= new Msg();
+            msg.setText(text);
+            msg.setOrigin(1L);
+            msg.setNeedKey(chat.getNeedKey());
+            Target t= new Target();
+            t.setUserKey(chat.getUserKey());
+            msg.addTarget(t);
+            Long msgKey=AppConfig.dataProvider.sendMessage(msg);
+            message.setMessageKey(msgKey);
+            ChatDAO.getInstance().update(chat);
+            MessageDAO.getInstance().insert(message);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void param) {
+            progress.dismiss();
+            mMediaPlayer.start();
+            if (!mMediaPlayer.isPlaying()) {
+                mMediaPlayer.reset();
+                mMediaPlayer.release();
+                mMediaPlayer = null;
+            }
+            Intent intentMsg = new Intent(MessageFragment.INTENT_FILTER_MSG_ADDED);
+            intentMsg.putExtra(MessageFragment.MESSAGE,message);
+            sendBroadcast(intentMsg);
+        }
+    }
+}

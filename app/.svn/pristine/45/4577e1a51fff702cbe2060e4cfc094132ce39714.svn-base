@@ -1,0 +1,165 @@
+package com.agora.entity;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by Ivan on 14/09/15.
+ */
+public class Need implements Serializable {
+
+    private Long needKey;
+
+    private Date expirationDate;
+    private String description;
+    private Date settlementDate;
+    private List<Bid> bids=new ArrayList<>();
+    private NeedDetail detail;
+    private int messagesNumber;
+    private int bidsNumber;
+    private Long userKey;
+
+    private Character type;
+
+    public Long getUserKey() {
+        return userKey;
+    }
+
+    public void setUserKey(Long userKey) {
+        this.userKey = userKey;
+    }
+
+
+    public Character getType() {
+        return type;
+    }
+
+    public void setType(Character type) {
+        this.type = type;
+    }
+
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    private Category category;
+
+    public Need(Long key,String description, char type,Category category){
+        needKey = key;
+        this.description=description;
+        this.type=type;
+        this.category=category;
+    }
+
+    public Need(Long key, Date expirationDate ,Date settlementDate, int msgNbr, int bidsNbr,String description, char type,Category category){
+        needKey = key;
+        this.expirationDate=expirationDate;
+        this.settlementDate =settlementDate;
+        this.messagesNumber=msgNbr;
+        this.bidsNumber=bidsNbr;
+        this.description=description;
+        this.type=type;
+        this.category=category;
+    }
+
+
+
+    public Date getSettlementDate() {
+        return settlementDate;
+    }
+
+    public void setSettlementDate(Date settlementDate) {
+        this.settlementDate = settlementDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public Long getNeedKey() {
+        return needKey;
+    }
+
+    public void setNeedKey(Long needKey) {
+        this.needKey = needKey;
+    }
+
+    public List<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(List<Bid> bids) {
+        this.bids = bids;
+    }
+
+    public NeedDetail getDetial() {
+        return detail;
+    }
+
+    public void setDetial(NeedDetail detial) {
+        this.detail = detial;
+    }
+
+    public int getMessagesNumber() {
+        return messagesNumber;
+    }
+
+    public void setMessagesNumber(int messagesNumber) {
+        this.messagesNumber = messagesNumber;
+    }
+
+    public int getBidsNumber() {
+        return bidsNumber;
+    }
+
+    public void setBidsNumber(int bidsNumber) {
+        this.bidsNumber = bidsNumber;
+    }
+
+    public String toString(){
+        StringBuffer buffer=new StringBuffer();
+        buffer.append("need:{");
+
+        if (needKey!=null) {
+            buffer.append("needKey:").append(needKey).append(",");
+        }
+
+        buffer.append("description:").append(description).append(",");
+        if (expirationDate!=null) {
+            buffer.append("expirationDate:").append(expirationDate.getTime()).append(",");
+        }
+        if (settlementDate!=null) {
+            buffer.append("settlementDate:").append(settlementDate.getTime()).append(",");
+        }
+        buffer.append("messagesNumber:").append(messagesNumber).append(",");
+        buffer.append("bidsNumber:").append(bidsNumber).append(",");
+        if (category!=null) {
+            buffer.append(category.toString()).append(",");
+        }
+        if (type!=null){
+            buffer.append("type:").append(type);
+        }
+        buffer.append("}");
+        return buffer.toString();
+    }
+}

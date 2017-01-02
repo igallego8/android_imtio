@@ -1,0 +1,158 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.agora.deal.DealFragment"
+    android:padding="25dp">
+
+    <FrameLayout
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/frame_logo"
+        android:layout_centerHorizontal="true" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Company name"
+        android:id="@+id/tv_company_name"
+        android:layout_below="@+id/frame_logo"
+        style="@style/text_2"
+        android:layout_centerHorizontal="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="rut - 432332342"
+        android:id="@+id/tv_company_rut"
+        android:layout_below="@+id/tv_company_name"
+        style="@style/text_4"
+        android:layout_centerHorizontal="true"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="calle 23 #34-23"
+        android:id="@+id/tv_company_address"
+        android:layout_below="@+id/tv_company_rut"
+        style="@style/text_3"
+        android:layout_centerHorizontal="true"
+        />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="phone 3213213"
+        android:id="@+id/tv_company_phone"
+        android:layout_below="@+id/tv_company_address"
+        style="@style/text_3"
+        android:layout_centerHorizontal="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="email@company.com"
+        android:id="@+id/tv_company_email"
+        android:layout_below="@+id/tv_company_phone"
+        style="@style/text_3"
+        android:layout_centerHorizontal="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="htt://www.company.com"
+        android:id="@+id/tv_company_webpage"
+        android:layout_below="@+id/tv_company_email"
+        style="@style/text_3"
+        android:layout_centerHorizontal="true"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_company_webpage"
+        android:orientation="horizontal"
+        android:id="@+id/layout_city_country"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_company_city"
+            android:text="Bogota"
+            style="@style/text_4"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--"
+            style="@style/text_3"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_company_country"
+            android:text="Colombia"
+            style="@style/text_4"
+            />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="Contacto"
+        android:id="@+id/tv_user_title"
+        android:layout_below="@+id/layout_city_country"
+        style="@style/text_3"
+        android:layout_centerHorizontal="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Juan carlos rojas"
+        android:id="@+id/tv_user_name"
+        android:layout_below="@+id/tv_user_title"
+        style="@style/text_2"
+        android:layout_centerHorizontal="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="+571 345345345"
+        android:id="@+id/tv_user_phone"
+        android:layout_below="@+id/tv_user_name"
+        style="@style/text_2"
+        android:layout_centerHorizontal="true"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>

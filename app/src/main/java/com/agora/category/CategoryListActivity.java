@@ -1,0 +1,133 @@
+package com.agora.category;
+
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.os.Bundle;
+
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
+
+
+import com.agora.R;
+import com.agora.app.ActivityToolBarProgress;
+import com.agora.entity.NeedType;
+
+public class CategoryListActivity  extends ActivityToolBarProgress implements LoaderManager.LoaderCallbacks<Cursor>, CategoryListFragment.OnFragmentInteractionListener {
+
+    public static final String TYPE = "type";
+
+    public NeedType getNeedType() {
+        return needType;
+    }
+
+    public void setNeedType(NeedType needType) {
+        this.needType = needType;
+    }
+
+    private NeedType needType;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_category_list);
+        super.onCreate();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        handleIntent(getIntent());
+        Intent intent = getIntent();
+        needType= (NeedType) intent.getSerializableExtra(TYPE);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_category_list, menu);
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.action_search:
+                onSearchRequested();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+/*        if(intent.getAction().equals(Intent.ACTION_SEARCH)){
+            doSearch(intent.getStringExtra(SearchManager.QUERY));
+        }else if(intent.getAction().equals(Intent.ACTION_VIEW)){
+            getPlace(intent.getStringExtra(SearchManager.EXTRA_DATA_KEY));
+        }*/
+    }
+
+    private void getPlace(String query){
+        Bundle data = new Bundle();
+        data.putString("query", query);
+        getSupportLoaderManager().restartLoader(1, data, this);
+    }
+
+
+    private void doSearch(String query){
+        Bundle data = new Bundle();
+        data.putString("query", query);
+        getSupportLoaderManager().restartLoader(0, data, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle query) {
+        CursorLoader cLoader = null;
+
+        if(id==0)
+            cLoader = new CursorLoader(getBaseContext(), CategoryProvider.SEARCH_URI, null, null, new String[]{ query.getString("query") }, null);
+        else if(id==1)
+            cLoader = new CursorLoader(getBaseContext(), CategoryProvider.DETAILS_URI, null, null, new String[]{ query.getString("query") }, null);
+        return cLoader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void setProgressState(int state) {
+        setProgressBarStatus(state);
+    }
+}

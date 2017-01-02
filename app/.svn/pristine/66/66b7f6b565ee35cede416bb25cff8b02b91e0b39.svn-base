@@ -1,0 +1,127 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <!--<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+        <!-- Customize your theme here. -->
+    <!--</style>-->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <!--<item name="colorPrimary">@android:color/transparent</item>-->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="drawerArrowStyle">@style/Theme.Test.DrawerArrowStyle</item>
+        <!--<item name="windowActionBarOverlay">true</item>-->
+    </style>
+
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="bt">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#008</item>
+    </style>
+
+    <style name="text_opacity">
+        <item name="android:opacity">opaque</item>
+    </style>
+
+
+    <style name="text_dark_opacity"  parent="text_opacity">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+
+    <style name="text_light_opacity"  parent="text_opacity">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+
+    <style name="primary_dark_text_opacity" parent="text_dark_opacity">
+        <item name="android:alpha">87</item>
+    </style>
+
+    <style name="secondary_dark_text_opacity" parent="text_dark_opacity">
+        <item name="android:alpha">54</item>
+    </style>
+
+    <style name="third_dark_text_opacity" parent="text_dark_opacity">
+        <item name="android:alpha">38</item>
+    </style>
+
+    <style name="primary_light_text_opacity" parent="text_light_opacity">
+        <item name="android:alpha">100</item>
+    </style>
+
+    <style name="secondary_light_text_opacity" parent="text_light_opacity">
+        <item name="android:alpha">70</item>
+    </style>
+
+    <style name="third_light_text_opacity" parent="text_light_opacity">
+        <item name="android:alpha">30</item>
+    </style>
+
+    <style name="title_1" parent="primary_light_text_opacity">
+        <item name="android:textSize">40sp</item>
+    </style>
+
+    <style name="text_1" parent="secondary_light_text_opacity">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="text_2" parent="primary_dark_text_opacity">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text_3" parent="secondary_dark_text_opacity">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="text_4" parent="secondary_dark_text_opacity">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="text_5" parent="primary_light_text_opacity">
+        <item name="android:textSize">30sp</item>
+    </style>
+
+
+    <style name="FullscreenTheme" parent="android:Theme.NoTitleBar">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">@style/ButtonBar</item>
+        <item name="metaButtonBarButtonStyle">@style/ButtonBarButton</item>
+    </style>
+
+    <style name="ButtonBarButton"/>
+
+    <!-- Backward-compatible version of ?android:attr/buttonBarStyle -->
+    <style name="ButtonBar">
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:background">@android:drawable/bottom_bar</item>
+    </style>
+
+
+    <style name="ToolBarStyle" >
+        <item name="titleTextAppearance">@style/TextAppearance.Widget.Event.Toolbar.Title</item>
+    </style>
+
+    <style name="TextAppearance.Widget.Event.Toolbar.Title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <!--Any text styling can be done here-->
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/toolbar_title</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Theme.Test.DrawerArrowStyle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@color/white</item>
+    </style>
+
+
+</resources>

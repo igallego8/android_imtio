@@ -1,0 +1,290 @@
+package com.agora.need;
+
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.NotificationManager;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+
+import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+
+import android.support.v4.app.NotificationCompat;
+import android.util.Base64;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.entity.Category;
+import com.agora.entity.Need;
+import com.agora.util.NeedType;
+
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+
+/**
+ * NeedNewDescriptionFragment
+ */
+public class NeedNewDescriptionFragment extends Fragment {
+
+    private int year;
+    private int month;
+    private int day;
+    private EditText expirationDate;
+    private EditText description;
+    private TextView imagesLoaded;
+    private CheckBox shippingService;
+    private CheckBox paymentOnSiteService;
+    private CheckBox paymentCreditCard;
+    private Date expDate;
+
+    private Activity activity;
+    private Long categoryKey;
+
+    private OnFragmentInteractionListener mListener;
+
+    public NeedNewDescriptionFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_need_new_description, container, false);
+
+    }
+
+    public static NeedNewDescriptionFragment newInstance(Integer needPosition) {
+        NeedNewDescriptionFragment fragment = new NeedNewDescriptionFragment();
+        Bundle args = new Bundle();
+        args.putInt("needPosition", needPosition);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onViewCreated(View view,  Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        imagesLoaded=(TextView)view.findViewById(R.id.tv_images_loaded);
+        description=(EditText)view.findViewById(R.id.et_description);
+        shippingService=(CheckBox)view.findViewById(R.id.cb_shipping_service);
+        paymentCreditCard=(CheckBox)view.findViewById(R.id.cb_payment_credit_card);
+        paymentOnSiteService=(CheckBox)view.findViewById(R.id.cb_payment_on_site);
+        expirationDate = (EditText) view.findViewById(R.id.et_expiration_date);
+        expirationDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    DateDialogFragment date = new DateDialogFragment();
+                    Calendar calender = Calendar.getInstance();
+                    Bundle args = new Bundle();
+                    args.putInt("year", calender.get(Calendar.YEAR));
+                    args.putInt("month", calender.get(Calendar.MONTH));
+                    args.putInt("day", calender.get(Calendar.DAY_OF_MONTH));
+                    date.setArguments(args);
+                    date.setOnDateSetListener(datePickerListener);
+                    date.show(getFragmentManager(), getResources().getString(R.string.title_date_picker));
+                }
+            }
+        } );
+
+    }
+
+    public void onResume(){
+        super.onResume();
+        if(AppContext.attachedImagesConfirmed) {
+            imagesLoaded.setVisibility(View.VISIBLE);
+            imagesLoaded.setText(R.string.some_image_attach);
+
+        }else{
+            imagesLoaded.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onActivityCreated( Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+
+    }
+
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity=activity;
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    private DatePickerDialog.OnDateSetListener datePickerListener
+            = new DatePickerDialog.OnDateSetListener() {
+        // when dialog box is closed, below method will be called.
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+            year = selectedYear;
+            month = selectedMonth;
+            day = selectedDay;
+            StringBuilder str= new StringBuilder().append(day)
+                    .append("-").append(month+1).append("-").append(year)
+                    .append(" ");
+            expirationDate.setText(str.toString());
+            try {
+                expDate= AppConfig.dateFormatter.parse(str.toString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            expirationDate.clearFocus();
+
+
+        }
+    };
+
+
+    public void createNeed(Long categoryKey){
+        this.categoryKey=categoryKey;
+        AsyncCreateNeedTask task = new AsyncCreateNeedTask();
+        task.execute();
+
+    }
+
+
+
+    private class AsyncCreateNeedTask extends AsyncTask<Void,Need,Void> {
+
+
+        private Need need;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            need = new Need(null,expDate,new Date (System.currentTimeMillis()),0,0,description.getText().toString(), NeedType.PRODUCT.getType(),new Category(categoryKey));
+            AppContext.needs.add(need);
+
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Long needKey=AppConfig.dataProvider.createNeed(need,0L);
+            need.setNeedKey(1L+needKey);
+            if (AppContext.attachedImagesConfirmed){
+                //Send Images to server using new needKey
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 3;
+                for (Bitmap bitmap: AppContext.attachedImages) {
+                    if (bitmap != null) {
+                       try {
+                           ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                           bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                           byte[] byte_arr = stream.toByteArray();
+                           String encodedString = Base64.encodeToString(byte_arr, Base64.NO_WRAP);
+                           sendImageHTTP(encodedString);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                }
+
+
+
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            //Notify that new need was sent
+            NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(activity)
+                        .setSmallIcon(R.drawable.ic_assignment_ind_white_24dp)
+                        .setContentTitle("Need Info")
+                        .setContentText("your need was sent to 4 providers");
+            SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+            if (preferences.getBoolean(AppConfig.PREF_KEY_NOTIF_VIB_NEW_BID,Boolean.FALSE)) {
+                mBuilder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
+            }
+            Intent intent =  new Intent(activity,NeedListActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            activity.startActivity(intent);
+            activity.finish();
+
+            //LED
+           // builder.setLights(Color.RED, 3000, 3000);
+
+            //Ton
+           // builder.setSound(Uri.parse("uri://sadfasdfasdf.mp3"));
+            NotificationManager notificationManager =
+                    (NotificationManager) activity.getSystemService(activity.NOTIFICATION_SERVICE);
+            notificationManager.notify(0, mBuilder.build());
+            }
+    }
+
+
+    // Make Http call to upload Image to Java server
+    public void sendImageHTTP(String encodedString) {
+        HashMap<String,String> params = new HashMap<String,String> ();
+        params.put("image",encodedString);
+        AppConfig.dataProvider.uploadImage(params);
+
+    }
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        public void onFragmentInteraction(Uri uri);
+    }
+
+
+
+}

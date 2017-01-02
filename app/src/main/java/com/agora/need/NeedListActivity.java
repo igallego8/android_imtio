@@ -1,0 +1,310 @@
+package com.agora.need;
+
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.content.Intent;
+
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.os.Bundle;
+import android.util.Log;
+import android.util.Pair;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.agora.R;
+import com.agora.app.ActivityToolBarProgress;
+import com.agora.app.AppConfig;
+import com.agora.app.AppContext;
+import com.agora.deal.DealActivity;
+import com.agora.deal.DealFragment;
+import com.agora.entity.Bid;
+import com.agora.entity.Deal;
+import com.agora.entity.Need;
+import com.agora.listener.ProgressBarStateListener;
+import com.agora.main.drawer.DrawerItemAdapter;
+import com.agora.main.drawer.DrawerItemBuilder;
+import com.agora.main.drawer.DrawerItemClickListener;
+import com.agora.need.NeedTypeDialog.CallbackTypeDialog;
+import com.agora.shell.fab.ActionButton;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
+
+
+public class NeedListActivity extends ActivityToolBarProgress implements ProgressBarStateListener,CallbackTypeDialog {
+
+    private TextView barNotificationMsgNbr;
+    private DrawerLayout mDrawerLayout;
+    protected ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mTitle, mDrawerTitle;
+    private ActionButton newNeedButton;
+    private Animation makeOutAnimation;
+    private Animation makeInAnimation;
+    private ProgressDialog progress;
+    private NeedListFragment fragment;
+    private AppContext appContext;
+    private  ShowcaseView sv;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_need_list);
+        super.onCreate();
+            appContext=(AppContext)getApplicationContext();
+        mTitle = getTitle();
+        mDrawerTitle = getTitle();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+                GravityCompat.START);
+        DrawerItemAdapter adapter = new DrawerItemAdapter(this, R.layout.drawer_item,
+                DrawerItemBuilder.getInstance().getItems());
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.setAdapter(adapter);
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener(this));
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
+            public void onDrawerClosed(View view) {
+                getSupportActionBar().setTitle(mTitle);
+            }
+            public void onDrawerOpened(View drawerView) {
+                getSupportActionBar().setTitle(mDrawerTitle);
+            }
+        };
+
+        mDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_drawer);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getSupportActionBar().setHomeButtonEnabled(true);
+        newNeedButton=(ActionButton)this.findViewById(R.id.bt_new_need);
+        makeOutAnimation = AnimationUtils.makeOutAnimation(getBaseContext(), true);
+        newNeedButton.setVisibility(View.INVISIBLE);
+        makeInAnimation = AnimationUtils.makeInAnimation(getBaseContext(), false);
+        newNeedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newNeedButton.setVisibility(View.INVISIBLE);
+                if (sv != null) {
+                    sv.hide();
+                }
+                NeedTypeDialog dialog = new NeedTypeDialog(NeedListActivity.this, NeedListActivity.this);
+                dialog.show();
+
+
+            }
+        });
+
+
+        makeInAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+                newNeedButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+
+        makeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                newNeedButton.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+        });
+        fragment = NeedListFragment.newInstance();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.add(R.id.fragment, fragment, "fragment_need_list");
+        transaction.commit();
+
+        SharedPreferences settings=  PreferenceManager.getDefaultSharedPreferences(this);
+        boolean flag=settings.getBoolean("showcase_need_new",false);
+
+        if (!flag) {
+            ViewTarget target = new ViewTarget(newNeedButton);
+            sv = new ShowcaseView.Builder(this)
+                    .setTarget(target)
+                    .setContentTitle(R.string.showcase_title_need_new)
+                    .setContentText(R.string.showcase_text_need_new)
+                    .hideOnTouchOutside()
+                    .setStyle(R.style.CustomShowcaseTheme3)
+                    .build();
+
+            sv.hideButton();
+            sv.show();
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("showcase_need_new",true);
+            editor.commit();
+        }
+    }
+
+    Handler handler = new Handler();
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_need_list, menu);
+        return true;
+    }
+
+    public void updateBarNotificationMsgNbr(final int number){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (number == 0) {
+                    barNotificationMsgNbr.setVisibility(View.INVISIBLE);
+                } else {
+                    barNotificationMsgNbr.setVisibility(View.VISIBLE);
+                    barNotificationMsgNbr.setText(Integer.toString(number));
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        switch (id){
+            case R.id.action_settings:
+                return true;
+            case android.R.id.home:
+                if(mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                }
+                else {
+                    mDrawerLayout.openDrawer(mDrawerList);
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void setProgressState(int state) {
+        setProgressBarStatus(state);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    protected void onResume(){
+        super.onResume();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("MyCoordinator", "Toggle animation");
+                newNeedButton.startAnimation(makeInAnimation);
+            }
+        }, 500);
+
+    }
+
+    public void onPause(){
+        super.onPause();
+        newNeedButton.setVisibility(View.INVISIBLE);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == 100) {
+            Need need = (Need)data.getExtras().get("need");
+            Bid bid = (Bid)data.getExtras().get("bid");
+            new AsyncCreateDealTask().execute(Pair.create(bid,need));
+        }else if (requestCode == 200 && resultCode == 100) {
+            Need need = (Need)data.getExtras().get("need");
+            for (int x = 0; x< appContext.getNeeds().size();x++){
+                if ( appContext.getNeeds().get(x).getNeedKey().longValue()==need.getNeedKey().longValue()){
+                    //AppContext.needs.remove(x);
+                    //AppContext.needs.add(x,need);
+                    appContext.getNeeds().get(x).setDealKey(need.getDealKey());
+                    fragment.getAdapter().notifyDataSetChanged();
+                    break;
+                }
+            }
+
+        }
+    }
+
+    @Override
+    public void cancel() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("MyCoordinator", "Toggle animation");
+                newNeedButton.startAnimation(makeInAnimation);
+            }
+        }, 500);
+    }
+
+
+    class AsyncCreateDealTask extends AsyncTask<Pair<Bid,Need>, Void, Need> {
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(NeedListActivity.this, null,
+                    getResources().getString(R.string.please_wait), true);
+            progress.show();
+        }
+
+        @Override
+        protected Need doInBackground(Pair<Bid,Need>... params) {
+            Bid bid = params[0].first;
+            Need need = params[0].second;
+            Deal deal= new Deal();
+            deal.setNeed(need);
+            deal.setBid(bid);
+            Long dealKey=AppConfig.dataProvider.createDeal(deal);
+            need.setDealKey(dealKey);
+            return need;
+        }
+
+        @Override
+        protected void onPostExecute(Need need) {
+            Intent intent = new Intent(NeedListActivity.this, DealActivity.class);
+            intent.putExtra(DealActivity.ARG_NEED,need);
+            NeedListActivity.this.startActivityForResult(intent,200);
+            progress.dismiss();
+
+        }
+    }
+
+
+
+
+}
+
+

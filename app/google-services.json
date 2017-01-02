@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "751225598219",
+    "firebase_url": "https://imtio-4925c.firebaseio.com",
+    "project_id": "imtio-4925c",
+    "storage_bucket": "imtio-4925c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:751225598219:android:2f23cb8f9a930979",
+        "android_client_info": {
+          "package_name": "com.agora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "751225598219-2cnsclg1sd25faeos2jp692m3k0cjia5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.agora",
+            "certificate_hash": "7111F0FD2E4F22D724FF361B9FD3FDDB0F5B54A7"
+          }
+        },
+        {
+          "client_id": "751225598219-8uvn835ukn85ub276ud6g4qstg5nu3tc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV9mXofEE_WtEM_lUi5fdq0VYWgtA7BGA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "751225598219-8uvn835ukn85ub276ud6g4qstg5nu3tc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

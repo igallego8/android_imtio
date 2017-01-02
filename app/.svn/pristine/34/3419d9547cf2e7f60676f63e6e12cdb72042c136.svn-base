@@ -1,0 +1,88 @@
+package com.agora.need;
+
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.net.Uri;
+
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import com.agora.R;
+import com.agora.app.ActivityToolBarProgress;
+import com.agora.app.AppContext;
+import com.agora.entity.Need;
+import com.agora.image.ImageDialogFragment;
+
+import java.util.ArrayList;
+
+public class NeedDetailActivity extends ActivityToolBarProgress implements NeedDetailFragment.OnFragmentInteractionListener, ImageDialogFragment.OnFragmentInteractionListener {
+
+    private Long categoryKey;
+    private NeedDetailFragment fragment;
+    private  Integer needPosition;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_need_detail);
+        super.onCreate();
+         needPosition = this.getIntent().getIntExtra("needPosition", -1);
+
+        if (savedInstanceState == null) {
+            // do whatever
+
+            fragment = NeedDetailFragment.newInstance(needPosition);
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.add(R.id.fragment9, fragment,"fragment9");
+            //transaction.replace(R.id.fragment7, fragment);
+            // transaction.addToBackStack(null);
+            transaction.commit();
+
+
+        }else{
+            fragment = (NeedDetailFragment) getFragmentManager().findFragmentByTag("fragment9");
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_need_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        if (id == R.id.action_attach) {
+            showEditDialog();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showEditDialog() {
+        FragmentManager fm = getFragmentManager();
+        ArrayList<String> imageList= new ArrayList<>();
+        Need need= AppContext.needs.get(needPosition);
+        if (need.getDetial().getImage1()!=null){
+            imageList.add(need.getDetial().getImage1());
+        }
+        if (need.getDetial().getImage2() != null) {
+            imageList.add(need.getDetial().getImage2());
+        }
+        if (need.getDetial().getImage3() != null) {
+            imageList.add(need.getDetial().getImage3());
+        }
+        ImageDialogFragment imageDialog = ImageDialogFragment.newInstance(imageList);
+        imageDialog.show(fm, "fragment_image");
+    }
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+}

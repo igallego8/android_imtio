@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:clickable="true"
+    style="@android:style/Widget.ActionButton">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:contentDescription="msg"
+        android:src="@drawable/ic_message_white_24dp"
+        android:id="@+id/i_msg_nbr_icon"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/t_msg_nbr"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:text="@null"
+        android:minWidth="17sp"
+
+        android:textStyle="bold"
+        android:background="@drawable/notification_icon_rounded_square"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
+        android:paddingBottom="1dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginBottom="15dp"/>
+
+
+</RelativeLayout><!-- From: file:/Users/Ivan/Documents/projects/Agora/app/src/main/res/layout/bar_notification_icon.xml -->

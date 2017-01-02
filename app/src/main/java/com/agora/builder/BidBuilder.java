@@ -1,0 +1,85 @@
+package com.agora.builder;
+
+import com.agora.app.AppContext;
+import com.agora.entity.Bid;
+import com.agora.entity.Category;
+import com.agora.entity.Company;
+import com.agora.entity.Employee;
+import com.agora.entity.Need;
+import com.agora.entity.User;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * Created by Ivan on 18/09/15.
+ */
+public class BidBuilder implements Builder {
+    @Override
+    public Object build(JSONObject o) throws JSONException {
+        Bid bid = new Bid();
+        Long key=Long.valueOf(o.getString("bidKey"));
+       // JSONObject jsonNeed= o.getJSONObject("need");
+        JSONObject jsonCompany= new JSONObject(o.get("company").toString());
+        JSONObject jsonUser= new JSONObject(o.get("user").toString());
+        User user= new Employee();
+        user.setUserKey(jsonUser.getLong("userKey"));
+       /* Long needKey=Long.valueOf(jsonNeed.getString("needKey"));
+        for (Need need: AppContext.needs){
+            if (need.getNeedKey()==needKey){
+                bid.setNeed(need);
+                break;
+            }
+        }*/
+        //Date expirationDate= new Date(o.getLong("expirationDate"));
+        //Date settlementDate= new Date(o.getLong("settlementDate"));
+        Date expirationDate= new Date(System.currentTimeMillis());
+        Date settlementDate= new Date(System.currentTimeMillis());
+        boolean shipToClientDestination=o.optBoolean("shipToClientDestination");
+        boolean deliveryOnSaleSite=o.optBoolean("deliveryOnSaleSite");
+        boolean creditCardPayment=o.optBoolean("creditCardPayment");
+        boolean cashPayment=o.optBoolean("cashPayment");
+        int deliveryDaysAfterDeal=o.optInt("deliveryDaysAfterDeal");
+        String observation= o.getString("observation");
+        String image1= o.optString("image1");
+        String image2= o.optString("image2");
+        String image3= o.optString("image3");
+        //Long dealKey= o.optLong("dealKey");
+        String companyName=jsonCompany.getString("companyName");
+        String companyLogo=jsonCompany.optString("logo");
+        float rating=(float)1;//jsonCompany.getDouble("rating");
+        Long companyKey=jsonCompany.getLong("companyKey");
+        Company company =  new Company();
+        company.setRating(rating);
+        company.setCompanyKey(companyKey);
+        company.setCompanyName(companyName);
+        company.setLogo(companyLogo);
+        String currency=o.getString("currency");
+        BigDecimal price = new BigDecimal (o.getString("price"));
+        bid.setExpirationDate(expirationDate);
+        bid.setBidKey(key);
+        bid.setCompany(company);
+        bid.setSettlementDate(settlementDate);
+        bid.setCreditCardPayment(creditCardPayment);
+        bid.setObservation(observation);
+        bid.setImage1(image1);
+        bid.setImage2(image2);
+        bid.setImage3(image3);
+        //bid.setDealKey(dealKey);
+        bid.setCreditCardPayment(creditCardPayment);
+        bid.setCashPayment(cashPayment);
+        bid.setDeliveryOnSaleSite(deliveryOnSaleSite);
+        bid.setShipToClientDestination(shipToClientDestination);
+        bid.setDeliveryDaysAfterDeal(deliveryDaysAfterDeal);
+        bid.setCurrency(currency);
+        bid.setPrice(price);
+        bid.setUser(user);
+        return bid;
+
+    }
+
+
+}

@@ -1,0 +1,68 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_home_pref"
+            android:checked="true"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/drawer_home_pref"/>
+
+
+        <item
+            android:id="@+id/drawer_my_account_title"
+            android:title="@string/drawer_my_account_title">
+             <menu>
+                <item
+                    android:id="@+id/drawer_my_account_pref"
+                    android:title="@string/drawer_my_account_pref"/>
+             </menu>
+        </item>
+
+        <item
+            android:id="@+id/drawer_notification_title"
+            android:title="@string/drawer_notification_title">
+
+             <menu>
+                <item
+                    android:id="@+id/drawer_notification_pref"
+                    android:title="@string/drawer_notification_pref"/>
+            </menu>
+        </item>
+
+
+        <item
+               android:id="@+id/drawer_more_title"
+               android:title="@string/drawer_more_title">
+
+              <menu>
+
+                  <item
+                      android:id="@+id/drawer_country_pref"
+                      android:title="@string/drawer_country_pref"/>
+
+                 <item
+                     android:id="@+id/drawer_feedback_pref"
+                     android:title="@string/drawer_feedback_pref"/>
+
+                 <item
+                     android:id="@+id/drawer_help_pref"
+                     android:title="@string/drawer_help_pref"/>
+
+                 <item
+                     android:id="@+id/drawer_terms_use_pref"
+                     android:title="@string/drawer_terms_use_pref"/>
+
+              <item
+                  android:id="@+id/drawer_privacity_pref"
+                  android:title="@string/drawer_privacity_pref"/>
+
+              <item
+                  android:id="@+id/drawer_logout_pref"
+                  android:title="@string/drawer_logout_pref"/>
+            </menu>
+        </item>
+
+    </group>
+</menu><!-- From: file:/Users/Ivan/Documents/projects/Agora/app/src/main/res/menu/menu_drawer.xml -->

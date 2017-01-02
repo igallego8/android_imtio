@@ -1,0 +1,288 @@
+package com.agora.bid;
+
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.entity.Bid;
+import com.agora.entity.Need;
+import com.agora.entity.ProductBid;
+import com.agora.entity.ServiceBid;
+import com.agora.listener.OnItemTouchListener;
+import com.agora.need.NeedListAdapter;
+import com.agora.util.NeedType;
+import com.agora.util.SwipeableRecyclerViewTouchListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link BidListFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link BidListFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class BidListFragment extends Fragment {
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private List<Bid> mItems= new ArrayList<>();
+    private ProgressBar mProgressBar;
+
+    private OnFragmentInteractionListener mListener;
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment BidListFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static BidListFragment newInstance(String param1, String param2) {
+        BidListFragment fragment = new BidListFragment();
+        Bundle args = new Bundle();
+        //args.putString(ARG_PARAM1, param1);
+        //args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public BidListFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+      /*  if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }*/
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_bid_list, container, false);
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+
+        public void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onViewCreated(View view,  Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mRecyclerView = (RecyclerView) getView().findViewById(R.id.bids_recycler_view);
+        mLayoutManager = new LinearLayoutManager( getActivity());
+        mProgressBar = (ProgressBar) getView().findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.GONE);
+        OnItemTouchListener itemTouchListener = new OnItemTouchListener() {
+            @Override
+            public void onCardViewTap(View view, int position) {
+                Toast.makeText(getActivity(), "Tapped " + mItems.get(position), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onButton1Click(View view, int position) {
+                Toast.makeText(getActivity(), "Clicked Button1 in " + mItems.get(position), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onButton2Click(View view, int position) {
+                Toast.makeText(getActivity(), "Clicked Button2 in " + mItems.get(position), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        mAdapter = new BidListAdapter(mItems,itemTouchListener);
+        mRecyclerView.setAdapter(mAdapter);
+        //adapter
+        SwipeableRecyclerViewTouchListener swipeTouchListener =
+                new SwipeableRecyclerViewTouchListener(mRecyclerView,
+                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+                            @Override
+                            public boolean canSwipe(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+
+                                    final int s=position;
+                                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            switch (which){
+                                                case DialogInterface.BUTTON_POSITIVE:
+                                                    //Yes button clicked
+                                                    mItems.remove(s);
+                                                    mAdapter.notifyItemRemoved(s);
+                                                    break;
+
+                                                case DialogInterface.BUTTON_NEGATIVE:
+                                                    //No button clicked
+                                                    break;
+                                            }
+                                        }
+                                    };
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                    builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+                                            .setNegativeButton("No", dialogClickListener).show();
+                                    // mItems.remove(position);
+                                    //mAdapter.notifyItemRemoved(position);
+                                }
+                                //mAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+                                    final int s=position;
+                                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            switch (which){
+                                                case DialogInterface.BUTTON_POSITIVE:
+                                                    //Yes button clicked
+                                                    mItems.remove(s);
+                                                    mAdapter.notifyItemRemoved(s);
+                                                    break;
+
+                                                case DialogInterface.BUTTON_NEGATIVE:
+                                                    //No button clicked
+                                                    break;
+                                            }
+                                        }
+                                    };
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                    builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+                                            .setNegativeButton("No", dialogClickListener).show();
+
+
+                                }
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+
+        mRecyclerView.addOnItemTouchListener(swipeTouchListener);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        AdpaterAsyncTask task = new AdpaterAsyncTask();
+        task.execute(new Need[]{new Need(1L,"Camisa", NeedType.PRODUCT.getType())});
+
+    }
+
+
+    private class AdpaterAsyncTask extends AsyncTask<Need, Void,   List<Bid> > {
+        @Override
+        protected void onPostExecute( List<Bid> result ) {
+            mProgressBar.setVisibility(ProgressBar.GONE);
+            mItems.clear();
+            for (Bid n: result){
+                mItems.add(n);
+            }
+            if (mAdapter!=null) {
+                mAdapter.notifyDataSetChanged();
+            }
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected  List<Bid>  doInBackground(Need... params) {
+            List<Bid> list = new ArrayList<Bid>();
+            if (params!= null && params.length>0) {
+                Need need = params[0];
+                list = AppConfig.dataProvider.fetchBidByNeedKey(need);
+                for (int x = 0; x < 100000000L; x++) {
+                }
+
+            }
+
+            return list;
+        }
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        /*if (mRecyclerViewDragDropManager != null) {
+            mRecyclerViewDragDropManager.release();
+            mRecyclerViewDragDropManager = null;
+        }
+        */
+
+
+        if (mRecyclerView != null) {
+            mRecyclerView.setItemAnimator(null);
+            mRecyclerView.setAdapter(null);
+            mRecyclerView = null;
+        }
+
+
+        mAdapter = null;
+        mLayoutManager = null;
+        super.onDestroyView();
+    }
+
+
+}

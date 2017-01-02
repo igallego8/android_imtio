@@ -1,0 +1,203 @@
+package com.agora.msg;
+
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.entity.Message;
+import com.agora.entity.Need;
+import com.agora.mockup.DTOBuilder;
+import com.agora.util.OnFocusEditTextChangeText;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link MessageFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link MessageFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class MessageFragment extends Fragment {
+
+    private ListView list;
+    private OnFragmentInteractionListener mListener;
+    private MessageAdapter listItemAdapter;
+    public static final String MESSAGE_KEY="messageKey";
+    public static final String MESSAGE_STATUS="status";
+    public static final String MESSAGE="message";
+    private ArrayList<Message> messages;
+    public static final String INTENT_FILTER_STATUS_MSG="com.agora.msg.MSG_STATUS_CHANGE";
+    public static final String INTENT_FILTER_MSG_ADDED="com.agora.msg.MSG_ADDED";
+    private  EditText text;
+
+    private BroadcastReceiver messageUpdateReceiver =  new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final  String status=intent.getStringExtra(MESSAGE_STATUS);
+            final Long messageKey=intent.getLongExtra(MESSAGE_KEY,-1L);
+            if (messageKey!=-1){
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateMessage(messageKey, status);
+                    }
+                });
+
+            }
+        }
+    };
+
+
+    private BroadcastReceiver messageAddReceiver =  new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final Message message=(Message)intent.getSerializableExtra(MESSAGE);
+            if (message!=null){
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addMessage(message);
+                    }
+                });
+
+            }
+
+
+        }
+    };
+
+
+    protected void addMessage(Message message){
+        messages.add(message);
+        listItemAdapter.notifyDataSetChanged();
+        list.smoothScrollToPosition(messages.size() - 1);
+    }
+
+    protected void updateMessage(Long messageKey,String status){
+        for (Message m:messages){
+            if (m.getMessageKey().equals(messageKey)){
+                m.setStatus(status);
+                break;
+            }
+        }
+        listItemAdapter.notifyDataSetChanged();
+    }
+
+    public static MessageFragment newInstance(ArrayList<Message> messages) {
+        MessageFragment fragment = new MessageFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("messages", messages);//.putStringArrayList("messages",  messagesInfo);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public MessageFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_message, container, false);
+    }
+
+
+    @Override
+    public void onViewCreated(View view,  Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        //messagesInfo=getArguments().getStringArrayList("messages");
+        messages=(ArrayList<Message>)getArguments().get("messages");
+        list = (ListView) getView().findViewById(R.id.msg_list);
+         listItemAdapter = new MessageAdapter(getActivity(),
+                R.layout.adapter_msg_item,messages);
+        list.setAdapter(listItemAdapter);
+        ImageButton sendButton=(ImageButton) getView().findViewById(R.id.ib_send_message);
+        text=(EditText) getView().findViewById(R.id.et_message_text);
+        text.setOnFocusChangeListener(new OnFocusEditTextChangeText(text,R.string.type_your_msg,view.getContext()));
+        sendButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                mListener.sendMessage(text.getText().toString(), Boolean.FALSE);
+                text.setText("");
+                text.clearFocus();
+                text.setSelected(false);
+                InputMethodManager inputManager = (InputMethodManager)
+                        getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow( getActivity().getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        });
+
+    }
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+
+    public interface OnFragmentInteractionListener {
+
+        public void sendMessage(String text,Boolean isIncoming);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(INTENT_FILTER_STATUS_MSG);
+        getActivity().registerReceiver(messageUpdateReceiver, filter);
+        IntentFilter filterAdd = new IntentFilter();
+        filterAdd.addAction(INTENT_FILTER_MSG_ADDED);
+        getActivity().registerReceiver(messageAddReceiver, filterAdd);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(messageUpdateReceiver);
+        getActivity().unregisterReceiver(messageAddReceiver);
+    }
+
+}

@@ -1,0 +1,34 @@
+package com.agora.app;
+
+import com.agora.data.DataProviderFactory;
+import com.agora.data.IDataProvider;
+import com.agora.data.MockDataProvider;
+import com.agora.data.WSDataProvider;
+
+/**
+ * Created by Ivan on 20/09/15.
+ */
+public  final class AppConfig {
+
+    public static IDataProvider dataProvider= DataProviderFactory.createDataProvider(MockDataProvider.class.getName());
+    public static final int TIMEOUT_HTTP_CONNECTION = 20000;
+
+    public static final String WS_URL="http://191.95.249.182/agora-webservices/needs";
+
+
+    public static final String PREF_KEY_USER_NAME="username";
+
+    public static final String PREF_KEY_USER_LAST_NAME="userlastname";
+
+    public static final String PREF_KEY_USER_KEY="userkey";
+
+    public static final String PREF_KEY_NOTIF_SOUND_NEW_BID= "pref_notification_sound_new_bid";
+
+    public static final String PREF_KEY_NOTIF_VIB_NEW_BID ="pref_notification_vib_new_bid";
+
+    private AppConfig(){
+
+    }
+
+
+}

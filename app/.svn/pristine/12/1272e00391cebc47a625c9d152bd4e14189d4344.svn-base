@@ -1,0 +1,164 @@
+package com.agora.need;
+
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.MotionEventCompat;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.agora.R;
+import com.agora.app.AppConfig;
+import com.agora.bid.BidListActivity;
+import com.agora.db.dao.ChatDAO;
+import com.agora.entity.AmountFilter;
+import com.agora.entity.Chat;
+import com.agora.entity.DateFilter;
+import com.agora.entity.Filter;
+import com.agora.entity.Need;
+import com.agora.entity.PaymentTypeFilter;
+import com.agora.entity.ShippingFilter;
+import com.agora.listener.OnItemTouchListener;
+import com.agora.msg.ChatListActivity;
+import com.agora.util.BackgroundItemColor;
+import com.agora.util.ExpandableTextView;
+import com.agora.util.UtilProcess;
+import com.agora.util.helper.ItemTouchHelperAdapter;
+import com.agora.util.helper.ItemTouchHelperViewHolder;
+import com.agora.util.helper.OnStartDragListener;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by Ivan on 13/09/15.
+ */
+public class NeedFilterListAdapter extends RecyclerView.Adapter<NeedFilterListAdapter.ViewHolder>  implements ItemTouchHelperAdapter {
+
+    private int year;
+    private int month;
+    private int day;
+    private List<Filter> mDataset;
+    private final OnStartDragListener mDragStartListener;
+    private Fragment fragment;
+
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        int aux=mDataset.get(fromPosition).getWeight();
+        mDataset.get(fromPosition).setWeight(mDataset.get(toPosition).getWeight());
+        mDataset.get(toPosition).setWeight(aux);
+        Collections.swap(mDataset, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        mDataset.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder implements
+            ItemTouchHelperViewHolder {
+        public View view;
+        public ViewHolder(View v) {
+            super(v);
+            view = v;
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
+        }
+    }
+
+    public NeedFilterListAdapter(List<Filter> myDataset,OnStartDragListener dragStartListener, Fragment fragment) {
+        this.mDataset = myDataset;
+        mDragStartListener = dragStartListener;
+        this.fragment=fragment;
+    }
+
+    public void setList(List<Filter> myDataset){
+        this.mDataset=myDataset;
+    }
+
+    @Override
+    public NeedFilterListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                   int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.cv_need_filter_item, parent, false);
+        ViewHolder vh = new ViewHolder(v);
+        return vh;
+    }
+
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        final Filter filter=mDataset.get(position);
+        filter.setWeight(mDataset.size()-position);
+        holder.view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                    mDragStartListener.onStartDrag(holder);
+                }
+                return false;
+            }
+        });
+        LinearLayout layoutIcon = (LinearLayout) holder.view.findViewById(R.id.layout_filter);
+        final Context context= holder.view.getContext();
+        layoutIcon.setOnClickListener(new CardView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (filter instanceof PaymentTypeFilter) {
+                }else if (filter instanceof AmountFilter) {
+                } else if (filter instanceof ShippingFilter) {
+                } else if (filter instanceof DateFilter) {
+                }
+            }
+        });
+        TextView name= (TextView) holder.view.findViewById(R.id.tv_filter_name);
+        name.setText(filter.getName());
+        ImageView icon= (ImageView) holder.view.findViewById(R.id.tv_filter_icon);
+        icon.setImageResource(filter.getIcon());
+    }
+
+    @Override
+    public int getItemCount() {
+        return mDataset.size();
+    }
+
+
+}

@@ -1,0 +1,76 @@
+package com.agora.util;
+
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.graphics.drawable.shapes.RectShape;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * Created by Ivan on 16/09/15.
+ */
+public final class UtilProcess {
+
+    private static int previousRandom=-1;
+    private static List<BackgroundItemColor> backgroundColors= new ArrayList<>();
+
+    static{
+
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#E57373"),Color.parseColor("#EF5350")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#BA68C8"),Color.parseColor("#AB47BC")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#9575CD"),Color.parseColor("#7E57C2")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#7986CB"),Color.parseColor("#5C6BC0")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#64B5F6"),Color.parseColor("#42A5F5")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#4DD0E1"),Color.parseColor("#26C6DA")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#81C784"),Color.parseColor("#66BB6A")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#AED581"),Color.parseColor("#9CCC65")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#FFD54F"),Color.parseColor("#FFCA28")));
+        backgroundColors.add(new BackgroundItemColor(Color.parseColor("#FF8A65"),Color.parseColor("#FF7043")));
+
+
+    }
+
+    public static int randInt(int min, int max) {
+        Random rand = new Random();
+        int randomNum=0;
+        do {
+             randomNum = rand.nextInt((max - min) + 1) + min;
+        }while(previousRandom==randomNum);
+        previousRandom=randomNum;
+
+        return randomNum;
+    }
+
+
+    public static ShapeDrawable getRoundColorDrawable(){
+        int color= backgroundColors.get(UtilProcess.randInt(0, backgroundColors.size()-1)).getColor1();
+        ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
+        drawable.getPaint().setStyle(Paint.Style.FILL); //See more paint style for border circle etc. like STROKE
+        drawable.getPaint().setAntiAlias(true);
+        drawable.getPaint().setColor(color);
+        drawable.setIntrinsicHeight(100); //converting dp to px, you can just put any integer instead of dp2px method
+        drawable.setIntrinsicWidth(100);
+        drawable.getPaint().setTextAlign(Paint.Align.CENTER);
+        return drawable;
+    }
+
+    public static BackgroundItemColor getRandomColor(){
+        return backgroundColors.get(UtilProcess.randInt(0, backgroundColors.size()-1));
+    }
+
+    public static ShapeDrawable getSquareColorDrawable(){
+        int color= backgroundColors.get(UtilProcess.randInt(0, backgroundColors.size()-1)).getColor1();
+        ShapeDrawable drawable = new ShapeDrawable(new RectShape());
+        drawable.getPaint().setStyle(Paint.Style.FILL); //See more paint style for border circle etc. like STROKE
+        drawable.getPaint().setAntiAlias(true);
+        drawable.getPaint().setColor(color);
+        drawable.setIntrinsicHeight(200); //converting dp to px, you can just put any integer instead of dp2px method
+        drawable.setIntrinsicWidth(200);
+        drawable.getPaint().setTextAlign(Paint.Align.CENTER);
+        return drawable;
+    }
+}

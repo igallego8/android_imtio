@@ -1,0 +1,58 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        agora {
+            keyAlias 'androiddebugkey'
+            keyPassword 'Catalina2014'
+            storeFile file('/Users/Ivan/Documents/keystore/android.jks')
+            storePassword 'Catalina2014'
+        }
+    }
+    compileSdkVersion 23
+    buildToolsVersion '21.1.1'
+    defaultConfig {
+        applicationId "com.agora"
+        minSdkVersion 19
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+
+
+
+    }
+    buildTypes {
+        release {
+            shrinkResources true
+            minifyEnabled true
+
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile 'com.android.support:multidex:1.0.0'
+    compile 'com.github.amlcurran.showcaseview:library:5.4.1'
+    compile 'com.android.support:support-annotations:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.android.support:cardview-v7:23.0.1'
+    compile 'com.android.support:recyclerview-v7:23.0.1'
+    compile 'com.github.shell-software:viewmover:1.1.0'
+    compile 'com.github.shell-software:uitools:1.1.0'
+    compile 'com.android.support:design:23.0.1'
+    compile 'com.android.support:percent:23.0.1'
+    compile 'com.facebook.fresco:fresco:0.9.0'
+    compile 'com.kogitune:pre-lollipop-activity-transition:1.1.0'
+    compile 'com.sothree.slidinguppanel:library:3.2.0'
+    compile 'com.google.firebase:firebase-core:9.6.1'
+    compile 'com.google.firebase:firebase-messaging:9.6.1'
+    compile 'com.google.firebase:firebase-auth:9.6.1'
+
+
+}
+apply plugin: 'com.google.gms.google-services'

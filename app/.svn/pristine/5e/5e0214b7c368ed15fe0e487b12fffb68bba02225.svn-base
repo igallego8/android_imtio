@@ -1,0 +1,38 @@
+package com.agora.app;
+
+import android.app.Application;
+import android.content.Context;
+import android.graphics.Bitmap;
+
+import com.agora.entity.Need;
+import com.facebook.drawee.backends.pipeline.Fresco;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by Ivan on 25/09/15.
+ */
+public class AppContext extends Application {
+
+    private static Context mContext;
+    public static List<Bitmap> attachedImages= new ArrayList<>();
+    public static List<String> imageURIs= new ArrayList<>();
+    public static boolean attachedImagesConfirmed=false;
+    public static List<Need> needs= new ArrayList<>();
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mContext = this;
+        Fresco.initialize(mContext);
+
+
+    }
+
+    public static Context getContext(){
+        return mContext;
+    }
+}
+
+

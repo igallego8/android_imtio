@@ -1,0 +1,65 @@
+package com.agora.data;
+
+import com.agora.entity.Conversation;
+import com.agora.entity.Bid;
+import com.agora.entity.Client;
+import com.agora.entity.Company;
+import com.agora.entity.Deal;
+import com.agora.entity.Employee;
+import com.agora.entity.Message;
+import com.agora.entity.Need;
+import com.agora.entity.ProductBid;
+import com.agora.entity.ServiceBid;
+import com.agora.entity.Topic;
+
+import java.util.List;
+
+/**
+ * Created by Ivan on 17/09/15.
+ */
+public interface IDataProvider {
+
+    List<Need> fetchNeedsByUserKey(Long userKey);
+    Need findNeedByNeedKey(Long needKey);
+    void getNeedDetail(Need need);
+    boolean createNeed(Need need, Long userKey);
+    boolean deleteNeedByNeedKey(Long needKey);
+
+    List<Conversation> fetchConversationByUserKey(Long userKey);
+    List<Conversation> fetchConversationByNeedKey(Long needKey);
+    List<Conversation> fetchConversationByCompanyKey(Long companyKey);
+    List<Message> fetchMessagesByNeedKey (Long needKey);
+    void sendClientMessage (Message message, Need need,Client client);
+    void sendCompanyMessage (Message message, Need need,Employee employee);
+
+    Bid findBidbyBidKey(Long bidKey);
+    List<Bid> fetchBidByNeedKey (Need need);
+    List<Bid> fetchBidByCompanyKey(Long companyKey);
+
+    boolean createBid (Bid bid, Long User);
+    boolean deleteBidByBidKey(Long bidKey);
+    Bid findBidByBidKey(Long userKey);
+
+
+    boolean createDeal(Deal deal);
+    boolean cancelDealByDealKey(Long deal);
+    List<Deal> fetchDealsByUserKey(Long userKey);
+    List<Deal> fetchDealByCompanyKey(Long companyKey);
+    Deal findDealByDealKey(Long dealKey);
+
+    List<Company> fetchFavoritiesByUserKey(Long userKey);
+    void setFavorityCompany(Long companyKey, Long userKey);
+
+    boolean login(String id, String password);
+    boolean createAccount(Client client);
+    Client findClientByUserKey(Long userKey);
+
+    List<Topic> fetchTopics();
+
+    void notifyMessagesRead(List<Long> messageKeys);
+    void notifyMessagesReceived(Long messageKey);
+
+    byte[] imageLowQuality(String file);
+    byte[] imageHighQuality(String file);
+
+}
